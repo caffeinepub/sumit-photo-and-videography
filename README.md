@@ -1,2 +1,3 @@
-# sumit-photo-and-videography
-Exported from Caffeine project: Sumit Photo and Videography
+## 
+
+To run app build and run docker image: `docker build -t app . docker run -it --network host app`

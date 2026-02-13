@@ -1,0 +1,76 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-add-a-dedicated-individual-photo-detail-page-route-and-ui-so-each-photo-can-be-opened-on-its-own-url-e-g-photos-photoid-instead-of-only-opening-inside-a-modal-on-photos",
+      "featureTitle": "Add a dedicated individual photo detail page route and UI so each photo can be opened on its own URL (e.g. `/photos/{photoId}`) instead of only opening inside a modal on `/photos`.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/pages/PhotoDetailPage.tsx",
+        "frontend/src/pages/PhotosPage.tsx"
+      ],
+      "components": [
+        "authorization@3.0.0",
+        "blob-storage@4.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-an-on-page-photo-slider-carousel-on-the-individual-photo-detail-page-that-lets-any-visitor-easily-move-to-the-previous-next-photo-in-the-overall-photos-gallery",
+      "featureTitle": "Implement an on-page photo slider/carousel on the individual photo detail page that lets any visitor easily move to the previous/next photo in the overall Photos gallery.",
+      "files": [
+        "frontend/src/hooks/useSwipeNavigation.ts",
+        "frontend/src/pages/PhotoDetailPage.tsx"
+      ],
+      "components": [
+        "authorization@3.0.0",
+        "blob-storage@4.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-preserve-existing-photo-actions-like-and-download-on-the-individual-photo-page-using-the-same-behavior-and-english-user-facing-messages-currently-used-in-the-photos-gallery",
+      "featureTitle": "Preserve existing photo actions (like and download) on the individual photo page, using the same behavior and English user-facing messages currently used in the Photos gallery.",
+      "files": [
+        "frontend/src/components/PhotoActions.tsx",
+        "frontend/src/pages/PhotoDetailPage.tsx",
+        "frontend/src/pages/PhotosPage.tsx"
+      ],
+      "components": [
+        "authorization@3.0.0",
+        "blob-storage@4.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

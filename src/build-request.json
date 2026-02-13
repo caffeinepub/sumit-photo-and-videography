@@ -1,0 +1,78 @@
+{
+  "kind": "build_request",
+  "title": "Add individual photo pages with swipeable slider navigation",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Add a dedicated individual photo detail page route and UI so each photo can be opened on its own URL (e.g. `/photos/{photoId}`) instead of only opening inside a modal on `/photos`.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "Each indivisual photo page"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A new TanStack Router route exists for viewing a single photo by ID (e.g. `/photos/$photoId`).",
+        "Opening a photo detail URL directly loads and displays the correct photo.",
+        "The existing Photos gallery page no longer requires a modal as the primary way to view a photo full-size (clicking a photo navigates to the individual photo page)."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Implement an on-page photo slider/carousel on the individual photo detail page that lets any visitor easily move to the previous/next photo in the overall Photos gallery.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "Enable slider so that user and everyone can easily slide to other photos easily and view it",
+          "Each indivisual photo page"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The individual photo page shows the current photo and provides clear Previous/Next controls to move through the full photo list.",
+        "The slider supports touch/mobile swipe gestures to go to the previous/next photo.",
+        "The slider supports keyboard navigation (Left/Right arrow keys) when the page is focused.",
+        "When navigating to the next/previous photo, the URL updates to the newly selected photo’s URL.",
+        "If the current `photoId` is not found, show an English error state (e.g., \"Photo not found\") with a link/button back to the main Photo Gallery (`/photos`)."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Preserve existing photo actions (like and download) on the individual photo page, using the same behavior and English user-facing messages currently used in the Photos gallery.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "Enable slider so that user and everyone can easily slide to other photos easily and view it"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The individual photo page includes a Like action for the current photo with the same login requirement behavior (unauthenticated users see an English toast like \"Please log in to like photos\").",
+        "The individual photo page includes a Download action for the current photo and triggers a download successfully.",
+        "Like count and liked state update correctly after toggling like."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not edit files under `frontend/src/components/ui` (compose existing shadcn components instead).",
+    "Do not edit immutable hook files: `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`.",
+    "Use English for any user-facing text."
+  ],
+  "nonGoals": [
+    "Fixing Internet Computer canister URL resolution / Error 400 deployment issues.",
+    "Google Search Console verification and SEO verification tag changes.",
+    "Adding a slider to the homepage or the `/photos` grid page itself (the slider is required on individual photo pages only)."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

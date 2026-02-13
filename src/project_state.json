@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Website project for \"Sumit Photo and Videography\" deployed on Internet Computer (.icp0.io) with ongoing accessibility/verification issues; adding an image slider feature for individual photo pages.",
+  "architectural_notes": [
+    "Site is deployed/hosted on Internet Computer canisters with an .icp0.io URL."
+  ],
+  "known_issues": [
+    "Live site intermittently inaccessible with \"Error 400: Canister ID Not Resolved\" / draft app expired, preventing Google Search Console verification."
+  ],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-add-a-dedicated-individual-photo-detail-page-route-and-ui-so-each-photo-can-be-opened-on-its-own-url-e-g-photos-photoid-instead-of-only-opening-inside-a-modal-on-photos",
+      "title": "Add a dedicated individual photo detail page route and UI so each photo can be opened on its own URL (e.g. `/photos/{photoId}`) instead of only opening inside a modal on `/photos`.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-an-on-page-photo-slider-carousel-on-the-individual-photo-detail-page-that-lets-any-visitor-easily-move-to-the-previous-next-photo-in-the-overall-photos-gallery",
+      "title": "Implement an on-page photo slider/carousel on the individual photo detail page that lets any visitor easily move to the previous/next photo in the overall Photos gallery.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-preserve-existing-photo-actions-like-and-download-on-the-individual-photo-page-using-the-same-behavior-and-english-user-facing-messages-currently-used-in-the-photos-gallery",
+      "title": "Preserve existing photo actions (like and download) on the individual photo page, using the same behavior and English user-facing messages currently used in the Photos gallery.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Add a photo slider/carousel on each individual photo page so users can easily slide through photos.",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Sumit Photo and Videography",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

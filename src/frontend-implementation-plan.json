@@ -1,0 +1,82 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Add individual photo pages with swipeable slider navigation",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Add a dedicated TanStack Router photo detail route and navigate to it from the Photos gallery instead of using a modal as the primary full-size viewer.",
+      "acceptanceCriteria": [
+        "A new TanStack Router route exists for viewing a single photo by ID (e.g. `/photos/$photoId`).",
+        "Opening a photo detail URL directly loads and displays the correct photo.",
+        "The existing Photos gallery page no longer requires a modal as the primary way to view a photo full-size (clicking a photo navigates to the individual photo page)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/PhotoDetailPage.tsx",
+          "operation": "create",
+          "description": "Create an individual photo detail page that reads `photoId` from the TanStack Router params, loads the full photo list for lookup, and renders the selected photo at a stable URL. Use the blob-storage ExternalBlob direct URL capability (getDirectURL) to display the image. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Register a new TanStack Router route for `/photos/$photoId` and wire it to the new PhotoDetailPage so direct navigation to a photo URL works."
+        },
+        {
+          "path": "frontend/src/pages/PhotosPage.tsx",
+          "operation": "modify",
+          "description": "Replace modal-based full-size viewing with navigation to the individual photo route on card click (e.g., via Link or navigate). Remove the Dialog/selectedPhoto modal as the primary viewing flow while keeping the grid and sorting UI intact."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Implement an on-page carousel on the individual photo page with Previous/Next controls plus swipe and keyboard navigation that updates the URL.",
+      "acceptanceCriteria": [
+        "The individual photo page shows the current photo and provides clear Previous/Next controls to move through the full photo list.",
+        "The slider supports touch/mobile swipe gestures to go to the previous/next photo.",
+        "The slider supports keyboard navigation (Left/Right arrow keys) when the page is focused.",
+        "When navigating to the next/previous photo, the URL updates to the newly selected photo’s URL.",
+        "If the current `photoId` is not found, show an English error state (e.g., \"Photo not found\") with a link/button back to the main Photo Gallery (`/photos`)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useSwipeNavigation.ts",
+          "operation": "create",
+          "description": "Add a small reusable hook to detect horizontal touch/pointer swipe gestures and invoke provided callbacks for previous/next navigation (tuned for mobile)."
+        },
+        {
+          "path": "frontend/src/pages/PhotoDetailPage.tsx",
+          "operation": "modify",
+          "description": "Add Previous/Next UI controls, hook up swipe gesture handling (via the new hook), and add keyboard Left/Right arrow handling on a focusable container. When changing the selection, navigate to the new `/photos/$photoId` URL so the address bar updates. If `photoId` is missing from the loaded list, show an English \"Photo not found\" state with a Link/Button back to `/photos`."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Preserve Like and Download actions on the individual photo page with the same behavior and English messages used in the Photos gallery.",
+      "acceptanceCriteria": [
+        "The individual photo page includes a Like action for the current photo with the same login requirement behavior (unauthenticated users see an English toast like \"Please log in to like photos\").",
+        "The individual photo page includes a Download action for the current photo and triggers a download successfully.",
+        "Like count and liked state update correctly after toggling like."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/PhotoActions.tsx",
+          "operation": "create",
+          "description": "Extract/centralize the existing Like + Download behaviors into a shared component used by both the Photos gallery cards and the individual photo page, preserving current English toast messages and update behavior. Leverage the authorization component’s Internet Identity state (useInternetIdentity) for the login requirement behavior. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/PhotosPage.tsx",
+          "operation": "modify",
+          "description": "Replace inlined Like/Download button implementations with the new shared PhotoActions component to ensure identical behavior/messages across gallery and photo detail views."
+        },
+        {
+          "path": "frontend/src/pages/PhotoDetailPage.tsx",
+          "operation": "modify",
+          "description": "Render the shared PhotoActions component for the currently selected photo to provide Like and Download on the individual photo page with the same behavior/messages as the gallery."
+        }
+      ]
+    }
+  ]
+}
