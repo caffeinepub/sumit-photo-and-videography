@@ -97,6 +97,12 @@ export interface UserShortlistDTO {
     user: Principal;
     images: Array<string>;
 }
+export interface UpdateOrderRequest {
+    customerName?: string;
+    fulfillDate?: Time;
+    numberOfDvd?: bigint;
+    numberOfPrints?: bigint;
+}
 export interface SpecialMomentImageUploadRequest {
     specialMomentId: bigint;
     blob: ExternalBlob;
@@ -112,6 +118,15 @@ export interface EventCreateRequest {
     name: string;
     description: string;
 }
+export interface Order {
+    id: bigint;
+    customerName: string;
+    status: OrderStatus;
+    orderDate: Time;
+    fulfillDate: Time;
+    numberOfDvd: bigint;
+    numberOfPrints: bigint;
+}
 export interface EventImageUploadRequest {
     eventId: bigint;
     blob: ExternalBlob;
@@ -124,8 +139,23 @@ export interface FooterContent {
     youtube: string;
     contactDetails: string;
 }
+export interface CreateOrderRequest {
+    customerName: string;
+    orderDate: Time;
+    fulfillDate: Time;
+    numberOfDvd: bigint;
+    numberOfPrints: bigint;
+}
 export interface UserProfile {
     name: string;
+}
+export interface UpdateOrderStatusRequest {
+    status: OrderStatus;
+}
+export enum OrderStatus {
+    Cancelled = "Cancelled",
+    Fulfilled = "Fulfilled",
+    Pending = "Pending"
 }
 export enum SortedOrder {
     newestFirst = "newestFirst",
@@ -140,14 +170,18 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     createEvent(request: EventCreateRequest): Promise<bigint>;
     createNewAuthenticatedUser(): Promise<boolean>;
+    createOrder(request: CreateOrderRequest): Promise<bigint>;
     createSpecialMoment(request: SpecialMomentCreateRequest): Promise<bigint>;
     deleteEvent(eventId: bigint): Promise<void>;
     deleteEventImage(eventId: bigint, imageId: string): Promise<void>;
+    deleteOrder(orderId: bigint): Promise<void>;
     deletePhoto(id: string): Promise<void>;
     deleteSpecialMoment(specialMomentId: bigint): Promise<void>;
     deleteSpecialMomentImage(specialMomentId: bigint, imageId: string): Promise<void>;
     deleteVideo(id: string): Promise<void>;
     getAllEventsSorted(order: SortedOrder): Promise<Array<EventDTO>>;
+    getAllOrders(): Promise<Array<Order>>;
+    getAllOrdersSortedByDate(): Promise<Array<Order>>;
     getAllPhotosSorted(order: SortedOrder): Promise<Array<Photo>>;
     getAllShortlistedImagesForUser(explicitUser: Principal, eventId: bigint): Promise<Array<string>>;
     getAllShortlistsForAdmin(): Promise<Array<UserShortlistDTO>>;
@@ -164,6 +198,8 @@ export interface backendInterface {
     getFilteredVideos(order: SortedOrder, filter: VideoFilter): Promise<Array<Video>>;
     getFooterContent(): Promise<FooterContent>;
     getLikedPhotos(user: Principal): Promise<Array<string>>;
+    getOrder(orderId: bigint): Promise<Order | null>;
+    getOrdersByStatus(status: OrderStatus): Promise<Array<Order>>;
     getPasswordProtectedEvents(): Promise<Array<bigint>>;
     getPhotoLikeCount(photoId: string): Promise<bigint>;
     getShortlistCountForImage(eventId: bigint, imageId: string): Promise<bigint>;
@@ -192,6 +228,8 @@ export interface backendInterface {
     toggleShortlist(eventId: bigint, imageId: string): Promise<boolean>;
     updateEvent(eventId: bigint, request: EventCreateRequest): Promise<void>;
     updateFooterContent(content: FooterContent): Promise<void>;
+    updateOrder(orderId: bigint, request: UpdateOrderRequest): Promise<void>;
+    updateOrderStatus(orderId: bigint, request: UpdateOrderStatusRequest): Promise<void>;
     uploadEventImage(request: EventImageUploadRequest): Promise<UploadResult>;
     uploadMultiplePhotos(request: MultiPhotoUploadRequest): Promise<Array<UploadResult>>;
     uploadPhoto(request: PhotoVideoUploadRequest): Promise<UploadResult>;

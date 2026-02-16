@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useState, useEffect } from 'react';
+import { useLocation } from '@tanstack/react-router';
 import { useGetAllPhotosSorted } from '../hooks/useQueries';
 import { SortedOrder } from '../backend';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -7,16 +7,38 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Image as ImageIcon } from 'lucide-react';
 import { PhotoActions } from '../components/PhotoActions';
+import PhotosViewer from '../components/PhotosViewer';
 import SEOHead from '../components/SEOHead';
 import type { Photo } from '../backend';
+import { toast } from 'sonner';
 
 export default function PhotosPage() {
-  const navigate = useNavigate();
+  const location = useLocation();
   const [sortOrder, setSortOrder] = useState<SortedOrder>(SortedOrder.newestFirst);
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+  const [scrollPosition, setScrollPosition] = useState(0);
   const { data: photos = [], isLoading, error } = useGetAllPhotosSorted(sortOrder);
 
-  const handlePhotoClick = (photoId: string) => {
-    navigate({ to: '/photos/$photoId', params: { photoId } });
+  // Show redirect notice if coming from a direct photo URL
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('redirected') === 'photo-detail') {
+      toast.info('Photos can be viewed from the gallery below');
+    }
+  }, [location.search]);
+
+  const handlePhotoClick = (photo: Photo) => {
+    // Save current scroll position
+    setScrollPosition(window.scrollY);
+    setSelectedPhoto(photo);
+  };
+
+  const handleCloseViewer = () => {
+    setSelectedPhoto(null);
+    // Restore scroll position
+    setTimeout(() => {
+      window.scrollTo(0, scrollPosition);
+    }, 0);
   };
 
   return (
@@ -96,7 +118,7 @@ export default function PhotosPage() {
                   <CardContent className="p-0">
                     <div
                       className="relative aspect-square cursor-pointer overflow-hidden bg-muted"
-                      onClick={() => handlePhotoClick(photo.id)}
+                      onClick={() => handlePhotoClick(photo)}
                     >
                       <img
                         src={imageUrl}
@@ -120,6 +142,11 @@ export default function PhotosPage() {
           </div>
         )}
       </div>
+
+      {/* Photo Viewer Overlay */}
+      {selectedPhoto && (
+        <PhotosViewer photo={selectedPhoto} onClose={handleCloseViewer} />
+      )}
     </>
   );
 }

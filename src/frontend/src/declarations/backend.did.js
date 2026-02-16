@@ -30,6 +30,13 @@ export const EventCreateRequest = IDL.Record({
   'name' : IDL.Text,
   'description' : IDL.Text,
 });
+export const CreateOrderRequest = IDL.Record({
+  'customerName' : IDL.Text,
+  'orderDate' : Time,
+  'fulfillDate' : Time,
+  'numberOfDvd' : IDL.Nat,
+  'numberOfPrints' : IDL.Nat,
+});
 export const SpecialMomentCreateRequest = IDL.Record({
   'date' : Time,
   'name' : IDL.Text,
@@ -53,6 +60,20 @@ export const EventDTO = IDL.Record({
   'description' : IDL.Text,
   'passwordProtected' : IDL.Bool,
   'images' : IDL.Vec(EventImage),
+});
+export const OrderStatus = IDL.Variant({
+  'Cancelled' : IDL.Null,
+  'Fulfilled' : IDL.Null,
+  'Pending' : IDL.Null,
+});
+export const Order = IDL.Record({
+  'id' : IDL.Nat,
+  'customerName' : IDL.Text,
+  'status' : OrderStatus,
+  'orderDate' : Time,
+  'fulfillDate' : Time,
+  'numberOfDvd' : IDL.Nat,
+  'numberOfPrints' : IDL.Nat,
 });
 export const Photo = IDL.Record({
   'id' : IDL.Text,
@@ -117,6 +138,13 @@ export const Visitor = IDL.Record({
   'principal' : IDL.Principal,
   'timestamp' : Time,
 });
+export const UpdateOrderRequest = IDL.Record({
+  'customerName' : IDL.Opt(IDL.Text),
+  'fulfillDate' : IDL.Opt(Time),
+  'numberOfDvd' : IDL.Opt(IDL.Nat),
+  'numberOfPrints' : IDL.Opt(IDL.Nat),
+});
+export const UpdateOrderStatusRequest = IDL.Record({ 'status' : OrderStatus });
 export const EventImageUploadRequest = IDL.Record({
   'eventId' : IDL.Nat,
   'blob' : ExternalBlob,
@@ -171,9 +199,11 @@ export const idlService = IDL.Service({
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'createEvent' : IDL.Func([EventCreateRequest], [IDL.Nat], []),
   'createNewAuthenticatedUser' : IDL.Func([], [IDL.Bool], []),
+  'createOrder' : IDL.Func([CreateOrderRequest], [IDL.Nat], []),
   'createSpecialMoment' : IDL.Func([SpecialMomentCreateRequest], [IDL.Nat], []),
   'deleteEvent' : IDL.Func([IDL.Nat], [], []),
   'deleteEventImage' : IDL.Func([IDL.Nat, IDL.Text], [], []),
+  'deleteOrder' : IDL.Func([IDL.Nat], [], []),
   'deletePhoto' : IDL.Func([IDL.Text], [], []),
   'deleteSpecialMoment' : IDL.Func([IDL.Nat], [], []),
   'deleteSpecialMomentImage' : IDL.Func([IDL.Nat, IDL.Text], [], []),
@@ -183,6 +213,8 @@ export const idlService = IDL.Service({
       [IDL.Vec(EventDTO)],
       ['query'],
     ),
+  'getAllOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
+  'getAllOrdersSortedByDate' : IDL.Func([], [IDL.Vec(Order)], ['query']),
   'getAllPhotosSorted' : IDL.Func([SortedOrder], [IDL.Vec(Photo)], ['query']),
   'getAllShortlistedImagesForUser' : IDL.Func(
       [IDL.Principal, IDL.Nat],
@@ -231,6 +263,8 @@ export const idlService = IDL.Service({
     ),
   'getFooterContent' : IDL.Func([], [FooterContent], ['query']),
   'getLikedPhotos' : IDL.Func([IDL.Principal], [IDL.Vec(IDL.Text)], ['query']),
+  'getOrder' : IDL.Func([IDL.Nat], [IDL.Opt(Order)], ['query']),
+  'getOrdersByStatus' : IDL.Func([OrderStatus], [IDL.Vec(Order)], ['query']),
   'getPasswordProtectedEvents' : IDL.Func([], [IDL.Vec(IDL.Nat)], ['query']),
   'getPhotoLikeCount' : IDL.Func([IDL.Text], [IDL.Nat], ['query']),
   'getShortlistCountForImage' : IDL.Func(
@@ -292,6 +326,8 @@ export const idlService = IDL.Service({
   'toggleShortlist' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Bool], []),
   'updateEvent' : IDL.Func([IDL.Nat, EventCreateRequest], [], []),
   'updateFooterContent' : IDL.Func([FooterContent], [], []),
+  'updateOrder' : IDL.Func([IDL.Nat, UpdateOrderRequest], [], []),
+  'updateOrderStatus' : IDL.Func([IDL.Nat, UpdateOrderStatusRequest], [], []),
   'uploadEventImage' : IDL.Func([EventImageUploadRequest], [UploadResult], []),
   'uploadMultiplePhotos' : IDL.Func(
       [MultiPhotoUploadRequest],
@@ -333,6 +369,13 @@ export const idlFactory = ({ IDL }) => {
     'name' : IDL.Text,
     'description' : IDL.Text,
   });
+  const CreateOrderRequest = IDL.Record({
+    'customerName' : IDL.Text,
+    'orderDate' : Time,
+    'fulfillDate' : Time,
+    'numberOfDvd' : IDL.Nat,
+    'numberOfPrints' : IDL.Nat,
+  });
   const SpecialMomentCreateRequest = IDL.Record({
     'date' : Time,
     'name' : IDL.Text,
@@ -356,6 +399,20 @@ export const idlFactory = ({ IDL }) => {
     'description' : IDL.Text,
     'passwordProtected' : IDL.Bool,
     'images' : IDL.Vec(EventImage),
+  });
+  const OrderStatus = IDL.Variant({
+    'Cancelled' : IDL.Null,
+    'Fulfilled' : IDL.Null,
+    'Pending' : IDL.Null,
+  });
+  const Order = IDL.Record({
+    'id' : IDL.Nat,
+    'customerName' : IDL.Text,
+    'status' : OrderStatus,
+    'orderDate' : Time,
+    'fulfillDate' : Time,
+    'numberOfDvd' : IDL.Nat,
+    'numberOfPrints' : IDL.Nat,
   });
   const Photo = IDL.Record({
     'id' : IDL.Text,
@@ -420,6 +477,13 @@ export const idlFactory = ({ IDL }) => {
     'principal' : IDL.Principal,
     'timestamp' : Time,
   });
+  const UpdateOrderRequest = IDL.Record({
+    'customerName' : IDL.Opt(IDL.Text),
+    'fulfillDate' : IDL.Opt(Time),
+    'numberOfDvd' : IDL.Opt(IDL.Nat),
+    'numberOfPrints' : IDL.Opt(IDL.Nat),
+  });
+  const UpdateOrderStatusRequest = IDL.Record({ 'status' : OrderStatus });
   const EventImageUploadRequest = IDL.Record({
     'eventId' : IDL.Nat,
     'blob' : ExternalBlob,
@@ -474,6 +538,7 @@ export const idlFactory = ({ IDL }) => {
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'createEvent' : IDL.Func([EventCreateRequest], [IDL.Nat], []),
     'createNewAuthenticatedUser' : IDL.Func([], [IDL.Bool], []),
+    'createOrder' : IDL.Func([CreateOrderRequest], [IDL.Nat], []),
     'createSpecialMoment' : IDL.Func(
         [SpecialMomentCreateRequest],
         [IDL.Nat],
@@ -481,6 +546,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'deleteEvent' : IDL.Func([IDL.Nat], [], []),
     'deleteEventImage' : IDL.Func([IDL.Nat, IDL.Text], [], []),
+    'deleteOrder' : IDL.Func([IDL.Nat], [], []),
     'deletePhoto' : IDL.Func([IDL.Text], [], []),
     'deleteSpecialMoment' : IDL.Func([IDL.Nat], [], []),
     'deleteSpecialMomentImage' : IDL.Func([IDL.Nat, IDL.Text], [], []),
@@ -490,6 +556,8 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(EventDTO)],
         ['query'],
       ),
+    'getAllOrders' : IDL.Func([], [IDL.Vec(Order)], ['query']),
+    'getAllOrdersSortedByDate' : IDL.Func([], [IDL.Vec(Order)], ['query']),
     'getAllPhotosSorted' : IDL.Func([SortedOrder], [IDL.Vec(Photo)], ['query']),
     'getAllShortlistedImagesForUser' : IDL.Func(
         [IDL.Principal, IDL.Nat],
@@ -542,6 +610,8 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(IDL.Text)],
         ['query'],
       ),
+    'getOrder' : IDL.Func([IDL.Nat], [IDL.Opt(Order)], ['query']),
+    'getOrdersByStatus' : IDL.Func([OrderStatus], [IDL.Vec(Order)], ['query']),
     'getPasswordProtectedEvents' : IDL.Func([], [IDL.Vec(IDL.Nat)], ['query']),
     'getPhotoLikeCount' : IDL.Func([IDL.Text], [IDL.Nat], ['query']),
     'getShortlistCountForImage' : IDL.Func(
@@ -607,6 +677,8 @@ export const idlFactory = ({ IDL }) => {
     'toggleShortlist' : IDL.Func([IDL.Nat, IDL.Text], [IDL.Bool], []),
     'updateEvent' : IDL.Func([IDL.Nat, EventCreateRequest], [], []),
     'updateFooterContent' : IDL.Func([FooterContent], [], []),
+    'updateOrder' : IDL.Func([IDL.Nat, UpdateOrderRequest], [], []),
+    'updateOrderStatus' : IDL.Func([IDL.Nat, UpdateOrderStatusRequest], [], []),
     'uploadEventImage' : IDL.Func(
         [EventImageUploadRequest],
         [UploadResult],

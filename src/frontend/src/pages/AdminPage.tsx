@@ -12,6 +12,7 @@ import SpecialMomentManagementSection from '../components/admin/SpecialMomentMan
 import UserStatisticsSection from '../components/admin/UserStatisticsSection';
 import VisitorsSection from '../components/admin/VisitorsSection';
 import ShortlistsSection from '../components/admin/ShortlistsSection';
+import OrdersSection from '../components/admin/OrdersSection';
 import AdminAccessHelper from '../components/AdminAccessHelper';
 import { useNavigate } from '@tanstack/react-router';
 
@@ -90,14 +91,15 @@ export default function AdminPage() {
         <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-br from-foreground to-accent bg-clip-text text-transparent">
           Admin Panel
         </h1>
-        <p className="mt-3 text-muted-foreground text-xl">Manage your photos, videos, events, special moments, and site content</p>
+        <p className="mt-3 text-muted-foreground text-xl">Manage your photos, videos, events, special moments, orders, and site content</p>
       </div>
       <Tabs defaultValue="photos" className="relative w-full">
-        <TabsList className="grid w-full grid-cols-8 glass-strong h-auto p-1">
+        <TabsList className="grid w-full grid-cols-9 glass-strong h-auto p-1">
           <TabsTrigger value="photos" className="font-semibold">Photos</TabsTrigger>
           <TabsTrigger value="videos" className="font-semibold">Videos</TabsTrigger>
           <TabsTrigger value="events" className="font-semibold">Events</TabsTrigger>
           <TabsTrigger value="special-moments" className="font-semibold">Special Moments</TabsTrigger>
+          <TabsTrigger value="orders" className="font-semibold">Orders</TabsTrigger>
           <TabsTrigger value="shortlists" className="font-semibold">Shortlists</TabsTrigger>
           <TabsTrigger value="statistics" className="font-semibold">Statistics</TabsTrigger>
           <TabsTrigger value="visitors" className="font-semibold">Visitors</TabsTrigger>
@@ -114,6 +116,9 @@ export default function AdminPage() {
         </TabsContent>
         <TabsContent value="special-moments">
           <SpecialMomentManagementSection />
+        </TabsContent>
+        <TabsContent value="orders">
+          <OrdersSection />
         </TabsContent>
         <TabsContent value="shortlists">
           <ShortlistsSection />

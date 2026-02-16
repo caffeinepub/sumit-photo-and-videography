@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
-import { useGetEvent, useIsEventPasswordProtected, useValidateEventPassword, useToggleShortlist, useHasUserShortlistedImage } from '../hooks/useQueries';
+import { useGetEvent, useIsEventPasswordProtected, useValidateEventPassword, useToggleShortlist, useHasUserShortlistedImageForCaller } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,7 +48,7 @@ function LoginPrompt() {
 }
 
 function ShortlistButton({ eventId, imageId }: { eventId: bigint; imageId: string }) {
-  const { data: isShortlisted = false } = useHasUserShortlistedImage(eventId, imageId);
+  const { data: isShortlisted = false } = useHasUserShortlistedImageForCaller(eventId, imageId);
   const toggleShortlist = useToggleShortlist();
 
   const handleToggle = async (e: React.MouseEvent) => {
@@ -337,75 +337,61 @@ export default function EventPage() {
       </div>
 
       {event.images.length > 0 ? (
-        <div className="relative grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {event.images.map((image, index) => {
-            const imageUrl = blobToUrl(image.blob);
-            return (
-              <div
-                key={image.id}
-                className="group relative aspect-square cursor-pointer overflow-hidden rounded-2xl glass transition-all hover:shadow-glow-md hover-lift animate-fade-in"
-                style={{ animationDelay: `${index * 0.05}s` }}
-                onClick={() => setSelectedImage(image)}
-              >
-                <ShortlistButton eventId={eventIdBigInt} imageId={image.id} />
-                <DownloadButton image={image} />
-                <img 
-                  src={imageUrl} 
-                  alt={image.name} 
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                  <p className="text-white text-sm font-medium truncate drop-shadow-lg">{image.name}</p>
-                </div>
+        <div className="relative grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {event.images.map((image) => (
+            <div
+              key={image.id}
+              className="group relative aspect-[4/3] overflow-hidden rounded-xl glass cursor-pointer hover-lift transition-all duration-300"
+              onClick={() => setSelectedImage(image)}
+            >
+              <img
+                src={blobToUrl(image.blob)}
+                alt={image.name}
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <ShortlistButton eventId={eventIdBigInt} imageId={image.id} />
+              <DownloadButton image={image} />
+              <div className="absolute bottom-0 left-0 right-0 p-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <h3 className="font-semibold text-lg truncate">{image.name}</h3>
+                {image.description && (
+                  <p className="text-sm text-white/90 line-clamp-2 mt-1">{image.description}</p>
+                )}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       ) : (
-        <div className="relative flex min-h-[400px] items-center justify-center rounded-2xl border-2 border-dashed border-border/50 glass">
-          <p className="text-muted-foreground text-lg font-medium">No images available for this event</p>
+        <div className="relative flex min-h-[40vh] items-center justify-center rounded-xl glass-strong">
+          <div className="text-center">
+            <Calendar className="mx-auto mb-4 h-16 w-16 text-muted-foreground opacity-50" />
+            <p className="text-xl text-muted-foreground">No images available for this event</p>
+          </div>
         </div>
       )}
 
       {selectedImage && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-6 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4"
           onClick={() => setSelectedImage(null)}
         >
           <button
-            className="absolute right-6 top-6 z-50 text-white hover:text-accent transition-colors text-4xl font-light"
             onClick={() => setSelectedImage(null)}
+            className="absolute right-4 top-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-colors"
           >
-            ×
+            <span className="text-2xl text-white">×</span>
           </button>
-          <div className="relative max-h-full max-w-full">
-            <img 
-              src={blobToUrl(selectedImage.blob)} 
-              alt="Full size" 
-              className="max-h-full max-w-full object-contain rounded-xl shadow-2xl" 
+          <div className="relative max-h-[90vh] max-w-[90vw]" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={blobToUrl(selectedImage.blob)}
+              alt={selectedImage.name}
+              className="max-h-[90vh] max-w-[90vw] object-contain rounded-lg"
             />
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-50">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const handleDownload = async () => {
-                    try {
-                      const filename = `${selectedImage.name.replace(/[^a-z0-9]/gi, '_')}.jpg`;
-                      await downloadImage(selectedImage.blob, filename);
-                      toast.success('Download started');
-                    } catch (error) {
-                      console.error('Download error:', error);
-                      toast.error('Failed to download image');
-                    }
-                  };
-                  handleDownload();
-                }}
-                className="flex items-center gap-2 rounded-full bg-white text-gray-900 px-6 py-3 backdrop-blur-md transition-all hover:bg-white hover:scale-110 hover:shadow-2xl shadow-xl border-2 border-white"
-              >
-                <Download className="h-5 w-5" />
-                <span className="font-semibold">Download</span>
-              </button>
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 rounded-b-lg">
+              <h3 className="text-xl font-semibold text-white mb-2">{selectedImage.name}</h3>
+              {selectedImage.description && (
+                <p className="text-white/90">{selectedImage.description}</p>
+              )}
             </div>
           </div>
         </div>

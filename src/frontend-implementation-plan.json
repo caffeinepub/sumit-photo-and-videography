@@ -1,80 +1,70 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add individual photo pages with swipeable slider navigation",
+  "title": "Admin Orders: status lifecycle management, filtering, and guarded access",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Add a dedicated TanStack Router photo detail route and navigate to it from the Photos gallery instead of using a modal as the primary full-size viewer.",
+      "summary": "Ensure Orders management is discoverable in the Admin Panel for admins and inaccessible to non-admin users.",
       "acceptanceCriteria": [
-        "A new TanStack Router route exists for viewing a single photo by ID (e.g. `/photos/$photoId`).",
-        "Opening a photo detail URL directly loads and displays the correct photo.",
-        "The existing Photos gallery page no longer requires a modal as the primary way to view a photo full-size (clicking a photo navigates to the individual photo page)."
+        "When logged in as an admin, the Admin Panel displays an \"Orders\" tab and selecting it shows the Orders management UI.",
+        "When logged in as a non-admin, Orders management UI cannot be accessed (direct navigation or UI entry points) and the user sees the existing non-admin access helper experience on the Admin page.",
+        "User-facing labels and messages in the Orders UI are in English."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/PhotoDetailPage.tsx",
-          "operation": "create",
-          "description": "Create an individual photo detail page that reads `photoId` from the TanStack Router params, loads the full photo list for lookup, and renders the selected photo at a stable URL. Use the blob-storage ExternalBlob direct URL capability (getDirectURL) to display the image. Verify the component's usage instructions before implementing."
+          "path": "frontend/src/pages/AdminPage.tsx",
+          "operation": "modify",
+          "description": "Confirm/adjust Admin Panel tab label to \"Orders\" and ensure OrdersSection is only rendered for admin users (maintain the existing non-admin helper experience on /admin)."
         },
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/components/Header.tsx",
           "operation": "modify",
-          "description": "Register a new TanStack Router route for `/photos/$photoId` and wire it to the new PhotoDetailPage so direct navigation to a photo URL works."
-        },
-        {
-          "path": "frontend/src/pages/PhotosPage.tsx",
-          "operation": "modify",
-          "description": "Replace modal-based full-size viewing with navigation to the individual photo route on card click (e.g., via Link or navigate). Remove the Dialog/selectedPhoto modal as the primary viewing flow while keeping the grid and sorting UI intact."
+          "description": "Ensure the top-level navigation only exposes the Admin entry point to admins (and does not introduce any Orders-specific navigation for non-admin users)."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Implement an on-page carousel on the individual photo page with Previous/Next controls plus swipe and keyboard navigation that updates the URL.",
+      "summary": "Add order status lifecycle management in the Orders section with status filtering and quick status actions for admins.",
       "acceptanceCriteria": [
-        "The individual photo page shows the current photo and provides clear Previous/Next controls to move through the full photo list.",
-        "The slider supports touch/mobile swipe gestures to go to the previous/next photo.",
-        "The slider supports keyboard navigation (Left/Right arrow keys) when the page is focused.",
-        "When navigating to the next/previous photo, the URL updates to the newly selected photo’s URL.",
-        "If the current `photoId` is not found, show an English error state (e.g., \"Photo not found\") with a link/button back to the main Photo Gallery (`/photos`)."
+        "Backend Order data includes a status field and persists it for each order.",
+        "Admins can create an order and it defaults to a defined initial status (e.g., Pending).",
+        "Admins can update an order’s status without changing the immutable order id and existing order date.",
+        "Orders list UI provides a status filter and the list updates accordingly.",
+        "Admins can mark an order as Fulfilled or Cancelled from the Orders section UI and the change is reflected after refresh/reload."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useSwipeNavigation.ts",
-          "operation": "create",
-          "description": "Add a small reusable hook to detect horizontal touch/pointer swipe gestures and invoke provided callbacks for previous/next navigation (tuned for mobile)."
+          "path": "frontend/src/components/admin/OrdersSection.tsx",
+          "operation": "modify",
+          "description": "Extend the existing Orders management UI to display the current order status, add a status filter (e.g., All/Pending/Fulfilled/Cancelled), and add quick actions to mark an order as Fulfilled or Cancelled using the new status-update mutation hook. Keep all user-facing text in English. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/pages/PhotoDetailPage.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add Previous/Next UI controls, hook up swipe gesture handling (via the new hook), and add keyboard Left/Right arrow handling on a focusable container. When changing the selection, navigate to the new `/photos/$photoId` URL so the address bar updates. If `photoId` is missing from the loaded list, show an English \"Photo not found\" state with a Link/Button back to `/photos`."
+          "description": "Add React Query hooks to support filtering orders by status and mutating order status, and wire them so the Orders list refetches/updates after a status change. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Preserve Like and Download actions on the individual photo page with the same behavior and English messages used in the Photos gallery.",
+      "summary": "Add/align React Query hooks and TypeScript types to support order status updates and ensure orders UI compiles without any casts.",
       "acceptanceCriteria": [
-        "The individual photo page includes a Like action for the current photo with the same login requirement behavior (unauthenticated users see an English toast like \"Please log in to like photos\").",
-        "The individual photo page includes a Download action for the current photo and triggers a download successfully.",
-        "Like count and liked state update correctly after toggling like."
+        "All new backend order mutation methods (status changes) trap or reject when called by non-admin principals.",
+        "Frontend uses React Query hooks to call the new backend methods and invalidates/refetches the orders list after successful mutations.",
+        "TypeScript types for Order/status and request payloads are updated so the OrdersSection compiles without `any` casts."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/PhotoActions.tsx",
-          "operation": "create",
-          "description": "Extract/centralize the existing Like + Download behaviors into a shared component used by both the Photos gallery cards and the individual photo page, preserving current English toast messages and update behavior. Leverage the authorization component’s Internet Identity state (useInternetIdentity) for the login requirement behavior. Verify the component's usage instructions before implementing."
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Implement status-focused hooks following existing patterns (query keys, enabled flags, and query invalidation). Add a status update mutation hook that invalidates the relevant orders queries on success, and add a status-based orders query hook that can be driven by the OrdersSection filter UI."
         },
         {
-          "path": "frontend/src/pages/PhotosPage.tsx",
+          "path": "frontend/src/components/admin/OrdersSection.tsx",
           "operation": "modify",
-          "description": "Replace inlined Like/Download button implementations with the new shared PhotoActions component to ensure identical behavior/messages across gallery and photo detail views."
-        },
-        {
-          "path": "frontend/src/pages/PhotoDetailPage.tsx",
-          "operation": "modify",
-          "description": "Render the shared PhotoActions component for the currently selected photo to provide Like and Download on the individual photo page with the same behavior/messages as the gallery."
+          "description": "Update OrdersSection to use the typed OrderStatus/UpdateOrderStatusRequest types (no any casts), call the new status mutation hook, and ensure it properly refetches/reflects status changes after mutation and after page refresh."
         }
       ]
     }

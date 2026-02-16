@@ -10,6 +10,13 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface CreateOrderRequest {
+  'customerName' : string,
+  'orderDate' : Time,
+  'fulfillDate' : Time,
+  'numberOfDvd' : bigint,
+  'numberOfPrints' : bigint,
+}
 export interface EventCreateRequest {
   'date' : Time,
   'name' : string,
@@ -51,6 +58,18 @@ export interface FooterContent {
 export interface MultiPhotoUploadRequest {
   'photos' : Array<PhotoVideoUploadRequest>,
 }
+export interface Order {
+  'id' : bigint,
+  'customerName' : string,
+  'status' : OrderStatus,
+  'orderDate' : Time,
+  'fulfillDate' : Time,
+  'numberOfDvd' : bigint,
+  'numberOfPrints' : bigint,
+}
+export type OrderStatus = { 'Cancelled' : null } |
+  { 'Fulfilled' : null } |
+  { 'Pending' : null };
 export interface Photo {
   'id' : string,
   'likeCount' : bigint,
@@ -95,6 +114,13 @@ export interface SpecialMomentImageUploadRequest {
   'name' : string,
 }
 export type Time = bigint;
+export interface UpdateOrderRequest {
+  'customerName' : [] | [string],
+  'fulfillDate' : [] | [Time],
+  'numberOfDvd' : [] | [bigint],
+  'numberOfPrints' : [] | [bigint],
+}
+export interface UpdateOrderStatusRequest { 'status' : OrderStatus }
 export interface UploadResult { 'message' : string, 'success' : boolean }
 export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
@@ -148,14 +174,18 @@ export interface _SERVICE {
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createEvent' : ActorMethod<[EventCreateRequest], bigint>,
   'createNewAuthenticatedUser' : ActorMethod<[], boolean>,
+  'createOrder' : ActorMethod<[CreateOrderRequest], bigint>,
   'createSpecialMoment' : ActorMethod<[SpecialMomentCreateRequest], bigint>,
   'deleteEvent' : ActorMethod<[bigint], undefined>,
   'deleteEventImage' : ActorMethod<[bigint, string], undefined>,
+  'deleteOrder' : ActorMethod<[bigint], undefined>,
   'deletePhoto' : ActorMethod<[string], undefined>,
   'deleteSpecialMoment' : ActorMethod<[bigint], undefined>,
   'deleteSpecialMomentImage' : ActorMethod<[bigint, string], undefined>,
   'deleteVideo' : ActorMethod<[string], undefined>,
   'getAllEventsSorted' : ActorMethod<[SortedOrder], Array<EventDTO>>,
+  'getAllOrders' : ActorMethod<[], Array<Order>>,
+  'getAllOrdersSortedByDate' : ActorMethod<[], Array<Order>>,
   'getAllPhotosSorted' : ActorMethod<[SortedOrder], Array<Photo>>,
   'getAllShortlistedImagesForUser' : ActorMethod<
     [Principal, bigint],
@@ -184,6 +214,8 @@ export interface _SERVICE {
   'getFilteredVideos' : ActorMethod<[SortedOrder, VideoFilter], Array<Video>>,
   'getFooterContent' : ActorMethod<[], FooterContent>,
   'getLikedPhotos' : ActorMethod<[Principal], Array<string>>,
+  'getOrder' : ActorMethod<[bigint], [] | [Order]>,
+  'getOrdersByStatus' : ActorMethod<[OrderStatus], Array<Order>>,
   'getPasswordProtectedEvents' : ActorMethod<[], Array<bigint>>,
   'getPhotoLikeCount' : ActorMethod<[string], bigint>,
   'getShortlistCountForImage' : ActorMethod<[bigint, string], bigint>,
@@ -215,6 +247,11 @@ export interface _SERVICE {
   'toggleShortlist' : ActorMethod<[bigint, string], boolean>,
   'updateEvent' : ActorMethod<[bigint, EventCreateRequest], undefined>,
   'updateFooterContent' : ActorMethod<[FooterContent], undefined>,
+  'updateOrder' : ActorMethod<[bigint, UpdateOrderRequest], undefined>,
+  'updateOrderStatus' : ActorMethod<
+    [bigint, UpdateOrderStatusRequest],
+    undefined
+  >,
   'uploadEventImage' : ActorMethod<[EventImageUploadRequest], UploadResult>,
   'uploadMultiplePhotos' : ActorMethod<
     [MultiPhotoUploadRequest],

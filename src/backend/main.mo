@@ -11,7 +11,11 @@ import Runtime "mo:core/Runtime";
 import AccessControl "authorization/access-control";
 import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
+import Nat "mo:core/Nat";
+import Bool "mo:core/Bool";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   include MixinStorage();
 
@@ -218,6 +222,42 @@ actor {
     images : [Text];
   };
 
+  // Orders with status
+  public type OrderStatus = {
+    #Pending;
+    #Fulfilled;
+    #Cancelled;
+  };
+
+  public type Order = {
+    id : Nat;
+    orderDate : Time.Time;
+    fulfillDate : Time.Time;
+    customerName : Text;
+    numberOfDvd : Nat;
+    numberOfPrints : Nat;
+    status : OrderStatus;
+  };
+
+  public type CreateOrderRequest = {
+    orderDate : Time.Time;
+    fulfillDate : Time.Time;
+    customerName : Text;
+    numberOfDvd : Nat;
+    numberOfPrints : Nat;
+  };
+
+  public type UpdateOrderRequest = {
+    fulfillDate : ?Time.Time;
+    customerName : ?Text;
+    numberOfDvd : ?Nat;
+    numberOfPrints : ?Nat;
+  };
+
+  public type UpdateOrderStatusRequest = {
+    status : OrderStatus;
+  };
+
   let accessControlState = AccessControl.initState();
   let photos = Map.empty<Text, Photo>();
   let videos = Map.empty<Text, Video>();
@@ -236,6 +276,10 @@ actor {
   let userLikes = Map.empty<Principal, Map.Map<Text, Bool>>();
   let eventShortlists = Map.empty<Nat, Map.Map<Principal, UserShortlist>>();
   let visitors = Map.empty<Time.Time, Visitor>();
+
+  // Orders storage with status
+  let orders = Map.empty<Nat, Order>();
+  var nextOrderId = 0;
 
   // Track validated event access per session
   let validatedEventAccess = Map.empty<Principal, Map.Map<Nat, Time.Time>>();
@@ -1377,5 +1421,112 @@ actor {
         count;
       };
     };
+  };
+
+  // Orders Functions with status
+
+  public shared ({ caller }) func createOrder(request : CreateOrderRequest) : async Nat {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admins can create orders");
+    };
+
+    let orderId = nextOrderId;
+    let newOrder : Order = {
+      id = orderId;
+      orderDate = request.orderDate;
+      fulfillDate = request.fulfillDate;
+      customerName = request.customerName;
+      numberOfDvd = request.numberOfDvd;
+      numberOfPrints = request.numberOfPrints;
+      status = #Pending;
+    };
+
+    orders.add(orderId, newOrder);
+    nextOrderId += 1;
+    orderId;
+  };
+
+  public shared ({ caller }) func updateOrder(orderId : Nat, request : UpdateOrderRequest) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admins can update orders");
+    };
+
+    switch (orders.get(orderId)) {
+      case (null) { Runtime.trap("Order not found") };
+      case (?existingOrder) {
+        let updatedOrder : Order = {
+          existingOrder with
+          fulfillDate = switch (request.fulfillDate) { case (null) { existingOrder.fulfillDate }; case (?d) { d } };
+          customerName = switch (request.customerName) { case (null) { existingOrder.customerName }; case (?c) { c } };
+          numberOfDvd = switch (request.numberOfDvd) { case (null) { existingOrder.numberOfDvd }; case (?n) { n } };
+          numberOfPrints = switch (request.numberOfPrints) { case (null) { existingOrder.numberOfPrints }; case (?n) { n } };
+        };
+        orders.add(orderId, updatedOrder);
+      };
+    };
+  };
+
+  public shared ({ caller }) func updateOrderStatus(orderId : Nat, request : UpdateOrderStatusRequest) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admins can update order status");
+    };
+
+    switch (orders.get(orderId)) {
+      case (null) { Runtime.trap("Order not found") };
+      case (?existingOrder) {
+        let updatedOrder : Order = {
+          existingOrder with
+          status = request.status;
+        };
+        orders.add(orderId, updatedOrder);
+      };
+    };
+  };
+
+  public shared ({ caller }) func deleteOrder(orderId : Nat) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admins can delete orders");
+    };
+    if (not orders.containsKey(orderId)) {
+      Runtime.trap("Order not found");
+    };
+    orders.remove(orderId);
+  };
+
+  public query ({ caller }) func getOrder(orderId : Nat) : async ?Order {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admins can view orders");
+    };
+    orders.get(orderId);
+  };
+
+  public query ({ caller }) func getAllOrders() : async [Order] {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admins can view orders");
+    };
+    orders.values().toArray();
+  };
+
+  public query ({ caller }) func getAllOrdersSortedByDate() : async [Order] {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admins can view orders");
+    };
+    let orderArray = orders.values().toArray();
+    orderArray.sort(
+      func(a, b) {
+        Int.compare(a.orderDate, b.orderDate);
+      }
+    );
+  };
+
+  public query ({ caller }) func getOrdersByStatus(status : OrderStatus) : async [Order] {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admins can view orders by status");
+    };
+    let ordersArray = orders.values().toArray();
+    let filtered = ordersArray.filter(
+      func(order) { order.status == status }
+    );
+    filtered;
   };
 };

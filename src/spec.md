@@ -1,13 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Add dedicated, shareable individual photo pages with swipeable previous/next navigation while preserving existing like/download behaviors.
+**Goal:** Add administrator-only access to an Orders section and implement full order management with order status lifecycle and status-based filtering/actions.
 
 **Planned changes:**
-- Add a new TanStack Router route for individual photo viewing by ID (e.g., `/photos/$photoId`) that loads and displays the correct photo when opened directly.
-- Update the `/photos` gallery behavior so clicking a photo navigates to its individual photo page instead of primarily using a modal for full-size viewing.
-- Build an on-page slider/carousel on the individual photo page with Previous/Next controls, touch swipe gestures, and Left/Right keyboard navigation; update the URL as the user moves between photos.
-- Add an English “Photo not found” error state for invalid IDs with a link/button back to `/photos`.
-- Preserve existing photo actions (Like and Download) on the individual photo page, including the same login-required toast messaging and correct like count/state updates.
+- Make the Orders section discoverable in the Admin Panel via an "Orders" tab that shows the existing Orders management UI for admins.
+- Block non-admin users from accessing Orders management screens and show the existing non-admin helper experience on the Admin page.
+- Add an order status field (at minimum: Pending, Fulfilled, Cancelled) to persisted Order data, with a default initial status for newly created orders.
+- Add admin controls in the Orders UI to filter orders by status and quickly mark orders as Fulfilled or Cancelled.
+- Add backend canister methods and React Query hooks to update order status and refetch/invalidate the orders list after mutations, with updated TypeScript types (no `any` casts).
+- If needed due to state shape changes, add a conditional Motoko migration to initialize a default status for pre-existing orders on upgrade.
 
-**User-visible outcome:** Visitors can open any photo on its own URL, swipe/click/keyboard-navigate to adjacent photos with the URL updating, and still like or download photos with the same behavior as in the gallery.
+**User-visible outcome:** Admins can open the Admin Panel’s Orders tab to view orders, filter by status, and mark orders as Fulfilled or Cancelled; non-admins cannot access Orders management.

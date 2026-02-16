@@ -1,79 +1,73 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T11:33:25.842Z",
+  "generatedAt": "2026-02-16T04:05:22.057Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 4,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Add a dedicated individual photo detail page route and UI so each photo can be opened on its own URL (e.g. `/photos/{photoId}`) instead of only opening inside a modal on `/photos`.",
-        "status": "implemented",
+        "summary": "Ensure the Orders section is clearly discoverable and accessible for administrators: the Admin Panel must include an \"Orders\" tab and render the existing Orders management UI when selected, and non-admin users must not be able to access Orders management screens.",
+        "status": "missing",
         "plannedFiles": [
-          "frontend/src/pages/PhotoDetailPage.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/pages/PhotosPage.tsx"
+          "frontend/src/pages/AdminPage.tsx",
+          "frontend/src/components/Header.tsx"
         ],
-        "matchedFiles": [
-          "frontend/src/pages/PhotoDetailPage.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/pages/PhotosPage.tsx"
-        ]
+        "matchedFiles": []
       },
       {
         "id": "REQ-2",
-        "summary": "Implement an on-page photo slider/carousel on the individual photo detail page that lets any visitor easily move to the previous/next photo in the overall Photos gallery.",
+        "summary": "Implement \"full order management\" capabilities in the Orders section by adding an order lifecycle status and management actions: store an order status (at minimum: Pending, Fulfilled, Cancelled), allow admins to update the status, and add UI controls to filter the orders list by status and quickly mark an order as Fulfilled/Cancelled.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useSwipeNavigation.ts",
-          "frontend/src/pages/PhotoDetailPage.tsx"
+          "frontend/src/components/admin/OrdersSection.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useSwipeNavigation.ts",
-          "frontend/src/pages/PhotoDetailPage.tsx"
+          "frontend/src/components/admin/OrdersSection.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Preserve existing photo actions (like and download) on the individual photo page, using the same behavior and English user-facing messages currently used in the Photos gallery.",
+        "summary": "Add necessary backend canister methods and React Query hooks (following existing patterns) to support the new order status field and status update operations, enforcing admin-only access for mutations and appropriate access for queries used by the admin UI.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/PhotoActions.tsx",
-          "frontend/src/pages/PhotosPage.tsx",
-          "frontend/src/pages/PhotoDetailPage.tsx"
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/admin/OrdersSection.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/PhotoActions.tsx",
-          "frontend/src/pages/PhotosPage.tsx",
-          "frontend/src/pages/PhotoDetailPage.tsx"
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/admin/OrdersSection.tsx"
         ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "If adding order status changes the stable/persistent state shape, add a conditional Motoko migration to preserve existing deployed orders by initializing the new status field for all existing orders.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
-    "build-template/Dockerfile",
-    "build-template/LICENSE",
-    "build-template/README.md",
-    "build-template/deploy.sh",
-    "build-template/icp.yaml",
-    "build-template/src/backend/canister.yaml",
-    "build-template/src/frontend/canister.yaml",
-    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/components/PhotoActions.tsx",
-    "frontend/src/hooks/useInternetIdentity.ts",
-    "frontend/src/hooks/useSwipeNavigation.ts",
-    "frontend/src/pages/PhotoDetailPage.tsx",
-    "frontend/src/pages/PhotosPage.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/admin/OrdersSection.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

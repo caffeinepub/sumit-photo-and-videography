@@ -1,34 +1,22 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Website project for \"Sumit Photo and Videography\" deployed on Internet Computer (.icp0.io) with ongoing accessibility/verification issues; adding an image slider feature for individual photo pages.",
-  "architectural_notes": [
-    "Site is deployed/hosted on Internet Computer canisters with an .icp0.io URL."
-  ],
-  "known_issues": [
-    "Live site intermittently inaccessible with \"Error 400: Canister ID Not Resolved\" / draft app expired, preventing Google Search Console verification."
-  ],
+  "summary": "Project includes an ORDER section; user requests adding full order management capabilities within it.",
+  "architectural_notes": [],
+  "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-add-a-dedicated-individual-photo-detail-page-route-and-ui-so-each-photo-can-be-opened-on-its-own-url-e-g-photos-photoid-instead-of-only-opening-inside-a-modal-on-photos",
-      "title": "Add a dedicated individual photo detail page route and UI so each photo can be opened on its own URL (e.g. `/photos/{photoId}`) instead of only opening inside a modal on `/photos`.",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-an-on-page-photo-slider-carousel-on-the-individual-photo-detail-page-that-lets-any-visitor-easily-move-to-the-previous-next-photo-in-the-overall-photos-gallery",
-      "title": "Implement an on-page photo slider/carousel on the individual photo detail page that lets any visitor easily move to the previous/next photo in the overall Photos gallery.",
+      "id": "feature-implement-full-order-management-capabilities-in-the-orders-section-by-adding-an-order-lifecycle-status-and-management-actions-store-an-order-status-at-minimum-pending-fulfilled-cancelled-allow-admins-to-update-the-status-and-add-ui-controls-to-filter-the-orders-list-by-status-and-quickly-mark-an-order-as-fulfilled-cancelled",
+      "title": "Implement \"full order management\" capabilities in the Orders section by adding an order lifecycle status and management actions: store an order status (at minimum: Pending, Fulfilled, Cancelled), allow admins to update the status, and add UI controls to filter the orders list by status and quickly mark an order as Fulfilled/Cancelled.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-preserve-existing-photo-actions-like-and-download-on-the-individual-photo-page-using-the-same-behavior-and-english-user-facing-messages-currently-used-in-the-photos-gallery",
-      "title": "Preserve existing photo actions (like and download) on the individual photo page, using the same behavior and English user-facing messages currently used in the Photos gallery.",
+      "id": "feature-add-necessary-backend-canister-methods-and-react-query-hooks-following-existing-patterns-to-support-the-new-order-status-field-and-status-update-operations-enforcing-admin-only-access-for-mutations-and-appropriate-access-for-queries-used-by-the-admin-ui",
+      "title": "Add necessary backend canister methods and React Query hooks (following existing patterns) to support the new order status field and status update operations, enforcing admin-only access for mutations and appropriate access for queries used by the admin UI.",
       "reqIds": [
         "REQ-3"
       ],
@@ -38,13 +26,28 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add a photo slider/carousel on each individual photo page so users can easily slide through photos.",
+      "summary": "Add full order management features in the ORDER section",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Ensure the Orders section is clearly discoverable and accessible for administrators: the Admin Panel must include an \"Orders\" tab and render the existing Orders management UI when selected, and non-admin users must not be able to access Orders management screens.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "If adding order status changes the stable/persistent state shape, add a conditional Motoko migration to preserve existing deployed orders by initializing the new status field for all existing orders.",
+      "reqIds": [
+        "REQ-4"
+      ],
       "status": "pending"
     }
   ],
-  "gameProjectType": "none",
-  "projectName": "Sumit Photo and Videography",
+  "projectName": "Add full order management in Orders section",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

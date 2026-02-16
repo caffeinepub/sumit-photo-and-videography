@@ -18,6 +18,11 @@ import type {
   SpecialMomentImageUploadRequest,
   Visitor,
   UserShortlistDTO,
+  Order,
+  CreateOrderRequest,
+  UpdateOrderRequest,
+  OrderStatus,
+  UpdateOrderStatusRequest,
 } from '../backend';
 
 // User Profile Queries
@@ -420,7 +425,7 @@ export function useDeleteEventImage() {
   });
 }
 
-// Special Moments Queries
+// Special Moment Queries
 export function useGetAllSpecialMomentsSorted(order: SortedOrder) {
   const { actor, isFetching } = useActor();
 
@@ -444,7 +449,6 @@ export function useGetSpecialMoment(specialMomentId: bigint) {
       return actor.getSpecialMoment(specialMomentId);
     },
     enabled: !!actor && !isFetching,
-    retry: false,
   });
 }
 
@@ -456,6 +460,21 @@ export function useCreateSpecialMoment() {
     mutationFn: async (request: SpecialMomentCreateRequest) => {
       if (!actor) throw new Error('Actor not available');
       return actor.createSpecialMoment(request);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['specialMoments'] });
+    },
+  });
+}
+
+export function useDeleteSpecialMoment() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (specialMomentId: bigint) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.deleteSpecialMoment(specialMomentId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['specialMoments'] });
@@ -495,7 +514,61 @@ export function useDeleteSpecialMomentImage() {
   });
 }
 
-// Event Image Shortlist Queries
+// Footer Queries
+export function useGetFooterContent() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<FooterContent>({
+    queryKey: ['footerContent'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.getFooterContent();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useUpdateFooterContent() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (content: FooterContent) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.updateFooterContent(content);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['footerContent'] });
+    },
+  });
+}
+
+// Visitor Queries
+export function useRecordVisitor() {
+  const { actor } = useActor();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.recordVisitor();
+    },
+  });
+}
+
+export function useGetVisitors(pagination: { start: bigint; limit: bigint }) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Visitor[]>({
+    queryKey: ['visitors', pagination.start.toString(), pagination.limit.toString()],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getVisitors(pagination);
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+// Shortlist Queries
 export function useToggleShortlist() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
@@ -506,14 +579,15 @@ export function useToggleShortlist() {
       return actor.toggleShortlist(eventId, imageId);
     },
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['shortlistStatus', variables.eventId.toString()] });
+      queryClient.invalidateQueries({ queryKey: ['shortlistStatus'] });
+      queryClient.invalidateQueries({ queryKey: ['shortlistedImages', variables.eventId.toString()] });
       queryClient.invalidateQueries({ queryKey: ['userShortlists'] });
       queryClient.invalidateQueries({ queryKey: ['allShortlists'] });
     },
   });
 }
 
-export function useHasUserShortlistedImage(eventId: bigint, imageId: string) {
+export function useHasUserShortlistedImageForCaller(eventId: bigint, imageId: string) {
   const { actor, isFetching } = useActor();
   const { identity } = useInternetIdentity();
 
@@ -568,69 +642,105 @@ export function useGetAllShortlistsForAdmin() {
   });
 }
 
-export function useGetShortlistCountForImage(eventId: bigint, imageId: string) {
+// Orders Queries
+export function useGetAllOrders() {
   const { actor, isFetching } = useActor();
 
-  return useQuery<bigint>({
-    queryKey: ['shortlistCount', eventId.toString(), imageId],
+  return useQuery<Order[]>({
+    queryKey: ['orders'],
     queryFn: async () => {
-      if (!actor) return BigInt(0);
-      return actor.getShortlistCountForImage(eventId, imageId);
+      if (!actor) return [];
+      return actor.getAllOrdersSortedByDate();
     },
     enabled: !!actor && !isFetching,
   });
 }
 
-// Footer Content
-export function useGetFooterContent() {
+export function useGetOrdersByStatus(status: OrderStatus | null) {
   const { actor, isFetching } = useActor();
 
-  return useQuery<FooterContent>({
-    queryKey: ['footerContent'],
+  return useQuery<Order[]>({
+    queryKey: ['orders', status],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getFooterContent();
+      if (!actor) return [];
+      if (status === null) {
+        return actor.getAllOrdersSortedByDate();
+      }
+      return actor.getOrdersByStatus(status);
     },
     enabled: !!actor && !isFetching,
   });
 }
 
-export function useUpdateFooterContent() {
+export function useGetOrder(orderId: bigint) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Order | null>({
+    queryKey: ['order', orderId.toString()],
+    queryFn: async () => {
+      if (!actor) return null;
+      return actor.getOrder(orderId);
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useCreateOrder() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (content: FooterContent) => {
+    mutationFn: async (request: CreateOrderRequest) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.updateFooterContent(content);
+      return actor.createOrder(request);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['footerContent'] });
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
   });
 }
 
-// Visitor Tracking
-export function useRecordVisitor() {
+export function useUpdateOrder() {
   const { actor } = useActor();
+  const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async ({ orderId, request }: { orderId: bigint; request: UpdateOrderRequest }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.recordVisitor();
+      return actor.updateOrder(orderId, request);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
     },
   });
 }
 
-export function useGetVisitors(start: number, limit: number) {
-  const { actor, isFetching } = useActor();
+export function useUpdateOrderStatus() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
 
-  return useQuery<Visitor[]>({
-    queryKey: ['visitors', start, limit],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.getVisitors({ start: BigInt(start), limit: BigInt(limit) });
+  return useMutation({
+    mutationFn: async ({ orderId, request }: { orderId: bigint; request: UpdateOrderStatusRequest }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.updateOrderStatus(orderId, request);
     },
-    enabled: !!actor && !isFetching,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+  });
+}
+
+export function useDeleteOrder() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (orderId: bigint) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.deleteOrder(orderId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
   });
 }

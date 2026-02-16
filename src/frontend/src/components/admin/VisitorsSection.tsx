@@ -13,8 +13,8 @@ export default function VisitorsSection() {
   const [currentPage, setCurrentPage] = useState(0);
   const { data: isAdmin } = useIsCallerAdmin();
 
-  const start = currentPage * ITEMS_PER_PAGE;
-  const { data: visitors = [], isLoading } = useGetVisitors(start, ITEMS_PER_PAGE);
+  const start = BigInt(currentPage * ITEMS_PER_PAGE);
+  const { data: visitors = [], isLoading } = useGetVisitors({ start, limit: BigInt(ITEMS_PER_PAGE) });
 
   const formatTimestamp = (timestamp: bigint) => {
     const date = new Date(Number(timestamp) / 1_000_000);
@@ -100,7 +100,7 @@ export default function VisitorsSection() {
                     const role = getVisitorRole(visitor);
                     return (
                       <TableRow key={`${visitor.timestamp}-${index}`}>
-                        <TableCell className="font-medium">{start + index + 1}</TableCell>
+                        <TableCell className="font-medium">{Number(start) + index + 1}</TableCell>
                         <TableCell className="font-mono text-xs">
                           {visitor.principal.isAnonymous()
                             ? 'Anonymous'
@@ -123,7 +123,7 @@ export default function VisitorsSection() {
 
             <div className="mt-4 flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
-                Showing {start + 1} - {start + visitors.length} visitors
+                Showing {Number(start) + 1} - {Number(start) + visitors.length} visitors
               </p>
               <div className="flex gap-2">
                 <Button
@@ -152,4 +152,3 @@ export default function VisitorsSection() {
     </Card>
   );
 }
-

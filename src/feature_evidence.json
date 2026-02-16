@@ -2,35 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-dedicated-individual-photo-detail-page-route-and-ui-so-each-photo-can-be-opened-on-its-own-url-e-g-photos-photoid-instead-of-only-opening-inside-a-modal-on-photos",
-      "featureTitle": "Add a dedicated individual photo detail page route and UI so each photo can be opened on its own URL (e.g. `/photos/{photoId}`) instead of only opening inside a modal on `/photos`.",
+      "featureId": "feature-implement-full-order-management-capabilities-in-the-orders-section-by-adding-an-order-lifecycle-status-and-management-actions-store-an-order-status-at-minimum-pending-fulfilled-cancelled-allow-admins-to-update-the-status-and-add-ui-controls-to-filter-the-orders-list-by-status-and-quickly-mark-an-order-as-fulfilled-cancelled",
+      "featureTitle": "Implement \"full order management\" capabilities in the Orders section by adding an order lifecycle status and management actions: store an order status (at minimum: Pending, Fulfilled, Cancelled), allow admins to update the status, and add UI controls to filter the orders list by status and quickly mark an order as Fulfilled/Cancelled.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/pages/PhotoDetailPage.tsx",
-        "frontend/src/pages/PhotosPage.tsx"
-      ],
-      "components": [
-        "authorization@3.0.0",
-        "blob-storage@4.0.0",
-        "qr-code@1.0.0",
-        "camera@1.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-an-on-page-photo-slider-carousel-on-the-individual-photo-detail-page-that-lets-any-visitor-easily-move-to-the-previous-next-photo-in-the-overall-photos-gallery",
-      "featureTitle": "Implement an on-page photo slider/carousel on the individual photo detail page that lets any visitor easily move to the previous/next photo in the overall Photos gallery.",
-      "files": [
-        "frontend/src/hooks/useSwipeNavigation.ts",
-        "frontend/src/pages/PhotoDetailPage.tsx"
+        "frontend/src/components/admin/OrdersSection.tsx",
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "authorization@3.0.0",
@@ -49,12 +25,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-preserve-existing-photo-actions-like-and-download-on-the-individual-photo-page-using-the-same-behavior-and-english-user-facing-messages-currently-used-in-the-photos-gallery",
-      "featureTitle": "Preserve existing photo actions (like and download) on the individual photo page, using the same behavior and English user-facing messages currently used in the Photos gallery.",
+      "featureId": "feature-add-necessary-backend-canister-methods-and-react-query-hooks-following-existing-patterns-to-support-the-new-order-status-field-and-status-update-operations-enforcing-admin-only-access-for-mutations-and-appropriate-access-for-queries-used-by-the-admin-ui",
+      "featureTitle": "Add necessary backend canister methods and React Query hooks (following existing patterns) to support the new order status field and status update operations, enforcing admin-only access for mutations and appropriate access for queries used by the admin UI.",
       "files": [
-        "frontend/src/components/PhotoActions.tsx",
-        "frontend/src/pages/PhotoDetailPage.tsx",
-        "frontend/src/pages/PhotosPage.tsx"
+        "frontend/src/components/admin/OrdersSection.tsx",
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "authorization@3.0.0",

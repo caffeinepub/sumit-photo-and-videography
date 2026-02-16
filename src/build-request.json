@@ -1,75 +1,93 @@
 {
   "kind": "build_request",
-  "title": "Add individual photo pages with swipeable slider navigation",
+  "title": "Add full order management in Orders section",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Add a dedicated individual photo detail page route and UI so each photo can be opened on its own URL (e.g. `/photos/{photoId}`) instead of only opening inside a modal on `/photos`.",
+      "text": "Ensure the Orders section is clearly discoverable and accessible for administrators: the Admin Panel must include an \"Orders\" tab and render the existing Orders management UI when selected, and non-admin users must not be able to access Orders management screens.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-user-1"
         ],
         "quotes": [
-          "Each indivisual photo page"
+          "Add full order managment in order section"
         ]
       },
       "acceptanceCriteria": [
-        "A new TanStack Router route exists for viewing a single photo by ID (e.g. `/photos/$photoId`).",
-        "Opening a photo detail URL directly loads and displays the correct photo.",
-        "The existing Photos gallery page no longer requires a modal as the primary way to view a photo full-size (clicking a photo navigates to the individual photo page)."
+        "When logged in as an admin, the Admin Panel displays an \"Orders\" tab and selecting it shows the Orders management UI.",
+        "When logged in as a non-admin, Orders management UI cannot be accessed (direct navigation or UI entry points) and the user sees the existing non-admin access helper experience on the Admin page.",
+        "User-facing labels and messages in the Orders UI are in English."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Implement an on-page photo slider/carousel on the individual photo detail page that lets any visitor easily move to the previous/next photo in the overall Photos gallery.",
-      "target": "frontend",
+      "text": "Implement \"full order management\" capabilities in the Orders section by adding an order lifecycle status and management actions: store an order status (at minimum: Pending, Fulfilled, Cancelled), allow admins to update the status, and add UI controls to filter the orders list by status and quickly mark an order as Fulfilled/Cancelled.",
+      "target": "both",
       "source": {
         "messageIds": [
           "msg-user-1"
         ],
         "quotes": [
-          "Enable slider so that user and everyone can easily slide to other photos easily and view it",
-          "Each indivisual photo page"
+          "Add full order managment in order section"
         ]
       },
       "acceptanceCriteria": [
-        "The individual photo page shows the current photo and provides clear Previous/Next controls to move through the full photo list.",
-        "The slider supports touch/mobile swipe gestures to go to the previous/next photo.",
-        "The slider supports keyboard navigation (Left/Right arrow keys) when the page is focused.",
-        "When navigating to the next/previous photo, the URL updates to the newly selected photo’s URL.",
-        "If the current `photoId` is not found, show an English error state (e.g., \"Photo not found\") with a link/button back to the main Photo Gallery (`/photos`)."
+        "Backend Order data includes a status field and persists it for each order.",
+        "Admins can create an order and it defaults to a defined initial status (e.g., Pending).",
+        "Admins can update an order’s status without changing the immutable order id and existing order date.",
+        "Orders list UI provides a status filter and the list updates accordingly.",
+        "Admins can mark an order as Fulfilled or Cancelled from the Orders section UI and the change is reflected after refresh/reload."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Preserve existing photo actions (like and download) on the individual photo page, using the same behavior and English user-facing messages currently used in the Photos gallery.",
-      "target": "frontend",
+      "text": "Add necessary backend canister methods and React Query hooks (following existing patterns) to support the new order status field and status update operations, enforcing admin-only access for mutations and appropriate access for queries used by the admin UI.",
+      "target": "both",
       "source": {
         "messageIds": [
           "msg-user-1"
         ],
         "quotes": [
-          "Enable slider so that user and everyone can easily slide to other photos easily and view it"
+          "Add full order managment in order section"
         ]
       },
       "acceptanceCriteria": [
-        "The individual photo page includes a Like action for the current photo with the same login requirement behavior (unauthenticated users see an English toast like \"Please log in to like photos\").",
-        "The individual photo page includes a Download action for the current photo and triggers a download successfully.",
-        "Like count and liked state update correctly after toggling like."
+        "All new backend order mutation methods (status changes) trap or reject when called by non-admin principals.",
+        "Frontend uses React Query hooks to call the new backend methods and invalidates/refetches the orders list after successful mutations.",
+        "TypeScript types for Order/status and request payloads are updated so the OrdersSection compiles without `any` casts."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "If adding order status changes the stable/persistent state shape, add a conditional Motoko migration to preserve existing deployed orders by initializing the new status field for all existing orders.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "Add full order managment in order section"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Upgrading the canister does not erase existing orders.",
+        "All pre-existing orders receive a valid default status after upgrade.",
+        "Migration is conditional (only runs when upgrading from older state that lacks the new field)."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under `frontend/src/components/ui` (compose existing shadcn components instead).",
-    "Do not edit immutable hook files: `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`.",
-    "Use English for any user-facing text."
+    "Backend must remain a single Motoko actor with all logic in backend/main.mo.",
+    "Do not edit files under frontend immutable paths (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui).",
+    "Use English for all user-facing text."
   ],
   "nonGoals": [
-    "Fixing Internet Computer canister URL resolution / Error 400 deployment issues.",
-    "Google Search Console verification and SEO verification tag changes.",
-    "Adding a slider to the homepage or the `/photos` grid page itself (the slider is required on individual photo pages only)."
+    "Do not add third-party authentication providers (only Internet Identity).",
+    "Do not add external databases or external backend services.",
+    "Do not implement real-time updates (no WebSockets/live subscriptions).",
+    "Do not add payments/invoicing unless explicitly requested."
   ],
   "imageRequirements": {
     "required": [],

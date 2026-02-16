@@ -6,7 +6,6 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import PhotosPage from './pages/PhotosPage';
-import PhotoDetailPage from './pages/PhotoDetailPage';
 import VideosPage from './pages/VideosPage';
 import AdminPage from './pages/AdminPage';
 import EventsPage from './pages/EventsPage';
@@ -17,6 +16,7 @@ import BusinessInfoPage from './pages/BusinessInfoPage';
 import ProfileSetupModal from './components/ProfileSetupModal';
 import SitemapPage from './pages/SitemapPage';
 import RobotsPage from './pages/RobotsPage';
+import RouterNotFoundRedirect from './components/RouterNotFoundRedirect';
 import { useRecordVisitor } from './hooks/useQueries';
 
 function Layout() {
@@ -41,6 +41,7 @@ function Layout() {
 
 const rootRoute = createRootRoute({
   component: Layout,
+  notFoundComponent: RouterNotFoundRedirect,
 });
 
 const indexRoute = createRoute({
@@ -53,12 +54,6 @@ const photosRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/photos',
   component: PhotosPage,
-});
-
-const photoDetailRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/photos/$photoId',
-  component: PhotoDetailPage,
 });
 
 const videosRoute = createRoute({
@@ -118,7 +113,6 @@ const robotsRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   indexRoute,
   photosRoute,
-  photoDetailRoute,
   videosRoute,
   eventsRoute,
   eventDetailRoute,
