@@ -74,9 +74,9 @@ export default {
             },
             boxShadow: {
                 xs: '0 1px 2px 0 rgba(0,0,0,0.05)',
-                'glow-sm': '0 0 20px oklch(var(--accent) / 0.40), 0 0 40px oklch(var(--accent) / 0.18)',
-                'glow-md': '0 0 35px oklch(var(--accent) / 0.50), 0 0 70px oklch(var(--accent) / 0.22)',
-                'glow-lg': '0 0 50px oklch(var(--accent) / 0.60), 0 0 100px oklch(var(--accent) / 0.28)',
+                'glow-sm': '0 0 25px oklch(var(--accent) / 0.45), 0 0 50px oklch(var(--accent) / 0.20), 0 0 75px oklch(var(--primary) / 0.15)',
+                'glow-md': '0 0 40px oklch(var(--accent) / 0.55), 0 0 80px oklch(var(--accent) / 0.25), 0 0 120px oklch(var(--primary) / 0.20)',
+                'glow-lg': '0 0 60px oklch(var(--accent) / 0.65), 0 0 120px oklch(var(--accent) / 0.30), 0 0 180px oklch(var(--primary) / 0.25)',
             },
             fontFamily: {
                 sans: [
@@ -135,8 +135,12 @@ export default {
                     '100%': { opacity: '1', transform: 'scale(1)' }
                 },
                 'glow': {
-                    '0%, 100%': { boxShadow: '0 0 20px oklch(var(--accent) / 0.40), 0 0 40px oklch(var(--accent) / 0.18)' },
-                    '50%': { boxShadow: '0 0 40px oklch(var(--accent) / 0.65), 0 0 80px oklch(var(--accent) / 0.28)' }
+                    '0%, 100%': { 
+                        boxShadow: '0 0 25px oklch(var(--accent) / 0.45), 0 0 50px oklch(var(--accent) / 0.22), 0 0 75px oklch(var(--primary) / 0.18)' 
+                    },
+                    '50%': { 
+                        boxShadow: '0 0 50px oklch(var(--accent) / 0.70), 0 0 100px oklch(var(--accent) / 0.32), 0 0 150px oklch(var(--primary) / 0.28)' 
+                    }
                 },
                 'float': {
                     '0%, 100%': { transform: 'translateY(0px)' },
@@ -144,10 +148,10 @@ export default {
                 },
                 'modern-glow': {
                     '0%, 100%': { 
-                        boxShadow: '0 0 25px oklch(var(--accent) / 0.45), 0 0 50px oklch(var(--accent) / 0.22), 0 0 75px oklch(var(--primary) / 0.18)' 
+                        boxShadow: '0 0 30px oklch(var(--accent) / 0.50), 0 0 60px oklch(var(--accent) / 0.25), 0 0 90px oklch(var(--primary) / 0.20)' 
                     },
                     '50%': { 
-                        boxShadow: '0 0 50px oklch(var(--accent) / 0.70), 0 0 100px oklch(var(--accent) / 0.32), 0 0 150px oklch(var(--primary) / 0.28)' 
+                        boxShadow: '0 0 60px oklch(var(--accent) / 0.75), 0 0 120px oklch(var(--accent) / 0.35), 0 0 180px oklch(var(--primary) / 0.30)' 
                     }
                 },
                 'parallax': {

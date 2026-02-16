@@ -1,14 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Add administrator-only access to an Orders section and implement full order management with order status lifecycle and status-based filtering/actions.
+**Goal:** Make the site UI more colorful and visually appealing with a cohesive, modern theme that works in both light and dark mode (not primarily blue/purple).
 
 **Planned changes:**
-- Make the Orders section discoverable in the Admin Panel via an "Orders" tab that shows the existing Orders management UI for admins.
-- Block non-admin users from accessing Orders management screens and show the existing non-admin helper experience on the Admin page.
-- Add an order status field (at minimum: Pending, Fulfilled, Cancelled) to persisted Order data, with a default initial status for newly created orders.
-- Add admin controls in the Orders UI to filter orders by status and quickly mark orders as Fulfilled or Cancelled.
-- Add backend canister methods and React Query hooks to update order status and refetch/invalidate the orders list after mutations, with updated TypeScript types (no `any` casts).
-- If needed due to state shape changes, add a conditional Motoko migration to initialize a default status for pre-existing orders on upgrade.
+- Refresh global Tailwind/CSS theme tokens (primary/accent/muted/border/ring) to a more colorful modern palette, ensuring readability/accessibility in light and dark mode.
+- Apply the updated theme consistently across all major sections/pages (Header, Footer, Home, Photos, Videos, Events, Special Moments, Business Info, Admin) with cohesive treatments for section headers, cards/containers, and call-to-action areas (gradients, accent borders, shadows).
+- Improve styling for key “options” and controls (select dropdown triggers/menus, badges/status indicators, filters, tabs if present, admin form inputs) including hover/selected/disabled/error/focus-visible states.
+- Enforce one coherent visual direction across the UI (consistent gradient style, spacing rhythm, typography emphasis, and component hierarchy) so no page feels visually inconsistent.
 
-**User-visible outcome:** Admins can open the Admin Panel’s Orders tab to view orders, filter by status, and mark orders as Fulfilled or Cancelled; non-admins cannot access Orders management.
+**User-visible outcome:** The entire website (including admin screens) looks more colorful and polished, with consistent styling across sections and clearly styled interactive controls in both light and dark mode.

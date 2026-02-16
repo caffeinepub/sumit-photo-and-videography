@@ -45,7 +45,7 @@ export default function PhotosPage() {
     <>
       <SEOHead page="photos" />
       <div className="relative container mx-auto px-4 py-12 min-h-screen">
-        {/* Cinematic Background */}
+        {/* Vibrant Background */}
         <div className="absolute inset-0 pointer-events-none">
           <div 
             className="absolute inset-0 opacity-5"
@@ -56,7 +56,7 @@ export default function PhotosPage() {
         </div>
         
         <div className="relative mb-12 animate-fade-in">
-          <h1 className="mb-4 text-6xl font-bold tracking-tight md:text-7xl bg-gradient-to-br from-foreground via-accent to-primary bg-clip-text text-transparent">
+          <h1 className="mb-4 text-6xl font-bold tracking-tight md:text-7xl gradient-heading">
             Photo Gallery
           </h1>
           <p className="text-muted-foreground text-2xl mb-10">Explore our collection of captured moments</p>
@@ -66,19 +66,19 @@ export default function PhotosPage() {
               value={sortOrder}
               onValueChange={(value) => setSortOrder(value as SortedOrder)}
             >
-              <SelectTrigger className="w-[200px] glass transition-all hover:border-accent hover:shadow-glow-sm">
+              <SelectTrigger className="w-[200px] control-surface">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="glass-strong">
-                <SelectItem value={SortedOrder.newestFirst}>Newest First</SelectItem>
-                <SelectItem value={SortedOrder.oldestFirst}>Oldest First</SelectItem>
+              <SelectContent className="glass-strong border-accent/30">
+                <SelectItem value={SortedOrder.newestFirst} className="hover:bg-accent/10 focus:bg-accent/15">Newest First</SelectItem>
+                <SelectItem value={SortedOrder.oldestFirst} className="hover:bg-accent/10 focus:bg-accent/15">Oldest First</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
 
         {error && (
-          <div className="relative mb-8 p-5 glass-strong border border-destructive/50 rounded-xl">
+          <div className="relative mb-8 p-5 glass-strong border-2 border-destructive/60 rounded-xl">
             <p className="text-destructive font-medium text-lg">Error loading photos. Please try refreshing the page.</p>
           </div>
         )}
@@ -86,7 +86,7 @@ export default function PhotosPage() {
         {isLoading ? (
           <div className="relative grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <Card key={i} className="overflow-hidden glass">
+              <Card key={i} className="overflow-hidden glass border-accent/20">
                 <CardContent className="p-0">
                   <Skeleton className="aspect-square w-full animate-shimmer" />
                   <div className="p-4 space-y-2">
@@ -99,7 +99,7 @@ export default function PhotosPage() {
           </div>
         ) : photos.length === 0 ? (
           <div className="relative flex min-h-[500px] flex-col items-center justify-center gap-8">
-            <div className="rounded-full bg-accent/15 p-10 shadow-glow-md">
+            <div className="rounded-full bg-gradient-to-br from-accent/20 to-primary/20 p-10 shadow-glow-md">
               <ImageIcon className="h-24 w-24 text-accent" />
             </div>
             <p className="text-2xl text-muted-foreground font-medium">No photos available yet.</p>
@@ -112,7 +112,7 @@ export default function PhotosPage() {
               return (
                 <Card
                   key={photo.id}
-                  className="group overflow-hidden glass transition-all hover:shadow-glow-lg hover-lift animate-fade-in"
+                  className="group overflow-hidden glass transition-all hover:shadow-glow-lg hover-lift animate-fade-in border-accent/20"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   <CardContent className="p-0">

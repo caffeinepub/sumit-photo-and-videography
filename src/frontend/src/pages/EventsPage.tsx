@@ -16,11 +16,11 @@ function LoginPrompt() {
 
   return (
     <div className="relative flex min-h-[70vh] flex-col items-center justify-center gap-10 px-4">
-      <div className="rounded-full bg-accent/15 p-12 shadow-glow-md">
-        <Lock className="h-28 w-28 text-accent" />
+      <div className="rounded-full bg-gradient-to-br from-primary/20 to-accent/20 p-12 shadow-glow-md">
+        <Lock className="h-28 w-28 text-primary" />
       </div>
       <div className="text-center space-y-6 max-w-md">
-        <h2 className="text-4xl font-bold tracking-tight">Authentication Required</h2>
+        <h2 className="text-4xl font-bold tracking-tight gradient-heading">Authentication Required</h2>
         <p className="text-2xl text-muted-foreground">
           Please log in to view this content
         </p>
@@ -32,7 +32,7 @@ function LoginPrompt() {
         size="lg"
         onClick={() => login()}
         disabled={loginStatus === 'logging-in'}
-        className="px-10 py-7 text-xl font-semibold transition-all hover:shadow-glow-lg animate-modern-glow"
+        className="px-10 py-7 text-xl font-semibold bg-gradient-to-r from-accent to-primary hover:shadow-glow-lg transition-all"
       >
         {loginStatus === 'logging-in' ? 'Logging in...' : 'Log In to Continue'}
       </Button>
@@ -70,7 +70,7 @@ export default function EventsPage() {
     <>
       <SEOHead page="events" />
       <div className="relative container mx-auto px-4 py-12 min-h-screen">
-        {/* Cinematic Background */}
+        {/* Vibrant Background */}
         <div className="absolute inset-0 pointer-events-none">
           <div 
             className="absolute inset-0 opacity-5"
@@ -81,14 +81,14 @@ export default function EventsPage() {
         </div>
         
         <div className="relative mb-12 animate-fade-in">
-          <h1 className="mb-4 text-6xl font-bold tracking-tight md:text-7xl bg-gradient-to-br from-foreground via-accent to-primary bg-clip-text text-transparent">
+          <h1 className="mb-4 text-6xl font-bold tracking-tight md:text-7xl gradient-heading">
             Events
           </h1>
           <p className="text-muted-foreground text-2xl mb-10">Browse our photography and videography events</p>
         </div>
 
         {error && (
-          <div className="relative mb-8 p-5 glass-strong border border-destructive/50 rounded-xl">
+          <div className="relative mb-8 p-5 glass-strong border-2 border-destructive/60 rounded-xl">
             <p className="text-destructive font-medium text-lg">Error loading events. Please try refreshing the page.</p>
           </div>
         )}
@@ -101,12 +101,12 @@ export default function EventsPage() {
             value={sortOrder}
             onValueChange={(value) => setSortOrder(value as SortedOrder)}
           >
-            <SelectTrigger className="w-[200px] glass transition-all hover:border-accent hover:shadow-glow-sm">
+            <SelectTrigger className="w-[200px] control-surface">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
-            <SelectContent className="glass-strong">
-              <SelectItem value={SortedOrder.newestFirst}>Newest First</SelectItem>
-              <SelectItem value={SortedOrder.oldestFirst}>Oldest First</SelectItem>
+            <SelectContent className="glass-strong border-accent/30">
+              <SelectItem value={SortedOrder.newestFirst} className="hover:bg-accent/10 focus:bg-accent/15">Newest First</SelectItem>
+              <SelectItem value={SortedOrder.oldestFirst} className="hover:bg-accent/10 focus:bg-accent/15">Oldest First</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -117,8 +117,8 @@ export default function EventsPage() {
           </div>
         ) : events.length === 0 ? (
           <div className="relative flex min-h-[500px] flex-col items-center justify-center gap-8">
-            <div className="rounded-full bg-accent/15 p-10 shadow-glow-md">
-              <Calendar className="h-24 w-24 text-accent" />
+            <div className="rounded-full bg-gradient-to-br from-primary/20 to-accent/20 p-10 shadow-glow-md">
+              <Calendar className="h-24 w-24 text-primary" />
             </div>
             <p className="text-2xl text-muted-foreground font-medium">No events available yet.</p>
             <p className="text-lg text-muted-foreground">Check back soon for new events!</p>
@@ -132,7 +132,7 @@ export default function EventsPage() {
               return (
                 <Card 
                   key={event.id.toString()} 
-                  className="overflow-hidden glass transition-all hover:shadow-glow-lg hover-lift animate-fade-in"
+                  className="overflow-hidden glass transition-all hover:shadow-glow-lg hover-lift animate-fade-in border-accent/20"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   {thumbnailUrl ? (
@@ -144,7 +144,7 @@ export default function EventsPage() {
                         loading="lazy"
                       />
                       {event.passwordProtected && (
-                        <Badge className="absolute right-4 top-4 glass-strong text-white hover:bg-black/90 border-accent/50 shadow-glow-sm">
+                        <Badge className="absolute right-4 top-4 badge-protected shadow-glow-sm">
                           <Lock className="mr-1.5 h-4 w-4" />
                           Protected
                         </Badge>
@@ -154,7 +154,7 @@ export default function EventsPage() {
                     <div className="relative flex aspect-video w-full items-center justify-center bg-muted">
                       <Image className="h-20 w-20 text-muted-foreground/50" />
                       {event.passwordProtected && (
-                        <Badge className="absolute right-4 top-4 glass-strong text-white hover:bg-black/90 border-accent/50 shadow-glow-sm">
+                        <Badge className="absolute right-4 top-4 badge-protected shadow-glow-sm">
                           <Lock className="mr-1.5 h-4 w-4" />
                           Protected
                         </Badge>
@@ -165,7 +165,7 @@ export default function EventsPage() {
                     <div className="flex items-start justify-between gap-2">
                       <CardTitle className="line-clamp-1 tracking-tight text-2xl">{event.name}</CardTitle>
                       {event.passwordProtected && (
-                        <Lock className="h-6 w-6 flex-shrink-0 text-accent" />
+                        <Lock className="h-6 w-6 flex-shrink-0 text-primary" />
                       )}
                     </div>
                     <CardDescription className="flex items-center gap-2 text-lg">
@@ -184,7 +184,7 @@ export default function EventsPage() {
                       <span className="font-medium">{event.images.length} {event.images.length === 1 ? 'image' : 'images'}</span>
                     </div>
                     <Link to="/events/$eventId" params={{ eventId: event.id.toString() }}>
-                      <Button className="w-full transition-all hover:shadow-glow-sm font-semibold text-base py-6">
+                      <Button className="w-full bg-gradient-to-r from-accent to-primary hover:shadow-glow-sm font-semibold text-base py-6">
                         {event.passwordProtected ? 'Access Event' : 'View Event'}
                       </Button>
                     </Link>

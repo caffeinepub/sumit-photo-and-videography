@@ -39,75 +39,85 @@ export default function Header() {
   const showAdminLink = isAdmin === true;
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/30 glass-strong">
+    <header className="sticky top-0 z-50 w-full border-b border-border/40 glass-strong shadow-lg">
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-3 transition-all hover:opacity-80 group">
-          <div className="rounded-xl bg-accent/15 p-2 transition-all group-hover:bg-accent/25 group-hover:scale-110">
+        <Link to="/" className="flex items-center gap-3 transition-all hover:opacity-90 group">
+          <div className="rounded-xl bg-gradient-to-br from-accent/20 to-primary/20 p-2.5 transition-all group-hover:from-accent/30 group-hover:to-primary/30 group-hover:scale-110 group-hover:shadow-glow-sm">
             <Camera className="h-6 w-6 text-accent" />
           </div>
-          <span className="text-xl font-bold tracking-tight">Sumit Photo & Videography</span>
+          <span className="text-xl font-bold tracking-tight bg-gradient-to-r from-foreground via-accent to-primary bg-clip-text text-transparent">
+            Sumit Photo & Videography
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-8 md:flex">
           <Link 
             to="/" 
-            className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent relative after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-0 after:bg-accent after:transition-all hover:after:w-full [&.active]:after:w-full"
+            className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent relative after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-0 after:bg-gradient-to-r after:from-accent after:to-primary after:transition-all hover:after:w-full [&.active]:after:w-full"
           >
             Home
           </Link>
           <Link 
             to="/photos" 
-            className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent relative after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-0 after:bg-accent after:transition-all hover:after:w-full [&.active]:after:w-full"
+            className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent relative after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-0 after:bg-gradient-to-r after:from-accent after:to-primary after:transition-all hover:after:w-full [&.active]:after:w-full"
           >
             Photo Gallery
           </Link>
           <Link 
             to="/videos" 
-            className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent relative after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-0 after:bg-accent after:transition-all hover:after:w-full [&.active]:after:w-full"
+            className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent relative after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-0 after:bg-gradient-to-r after:from-accent after:to-primary after:transition-all hover:after:w-full [&.active]:after:w-full"
           >
             Video Gallery
           </Link>
           <Link 
             to="/events" 
-            className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent relative after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-0 after:bg-accent after:transition-all hover:after:w-full [&.active]:after:w-full"
+            className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent relative after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-0 after:bg-gradient-to-r after:from-accent after:to-primary after:transition-all hover:after:w-full [&.active]:after:w-full"
           >
             Events
           </Link>
           <Link 
             to="/special-moments" 
-            className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent relative after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-0 after:bg-accent after:transition-all hover:after:w-full [&.active]:after:w-full"
+            className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent relative after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-0 after:bg-gradient-to-r after:from-accent after:to-primary after:transition-all hover:after:w-full [&.active]:after:w-full"
           >
             Special Moments
           </Link>
           <Link 
             to="/business-info" 
-            className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent relative after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-0 after:bg-accent after:transition-all hover:after:w-full [&.active]:after:w-full"
+            className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent relative after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-0 after:bg-gradient-to-r after:from-accent after:to-primary after:transition-all hover:after:w-full [&.active]:after:w-full"
           >
-            About
+            Contact
           </Link>
           {showAdminLink && (
             <Link 
               to="/admin" 
-              className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent relative after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-0 after:bg-accent after:transition-all hover:after:w-full [&.active]:after:w-full"
+              className="text-sm font-semibold transition-all hover:text-primary [&.active]:text-primary relative after:absolute after:bottom-[-4px] after:left-0 after:h-0.5 after:w-0 after:bg-gradient-to-r after:from-primary after:to-accent after:transition-all hover:after:w-full [&.active]:after:w-full"
             >
               Admin
             </Link>
           )}
-          <Button 
-            onClick={handleAuth} 
-            disabled={disabled} 
+        </nav>
+
+        <div className="hidden items-center gap-4 md:flex">
+          <Button
+            onClick={handleAuth}
+            disabled={disabled}
             variant={isAuthenticated ? 'outline' : 'default'}
-            className="transition-all hover:shadow-glow-sm font-semibold"
+            className={`px-6 py-2 font-semibold transition-all ${
+              isAuthenticated
+                ? 'hover:bg-accent/10 hover:text-accent hover:border-accent/50'
+                : 'bg-gradient-to-r from-accent to-primary hover:shadow-glow-md'
+            }`}
           >
             {buttonText}
           </Button>
-        </nav>
+        </div>
 
         {/* Mobile Menu Button */}
-        <button 
-          className="md:hidden transition-all hover:text-accent hover:scale-110" 
+        <button
+          className="md:hidden rounded-lg p-2 transition-all hover:bg-accent/10 hover:text-accent"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
         >
           {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
@@ -115,62 +125,76 @@ export default function Header() {
 
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
-        <div className="border-t border-border/30 glass-strong md:hidden animate-fade-in">
-          <nav className="container mx-auto flex flex-col gap-4 px-4 py-6">
+        <div className="border-t border-border/40 glass-strong md:hidden">
+          <nav className="container mx-auto flex flex-col gap-2 px-4 py-6">
             <Link
               to="/"
-              className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent py-2"
+              className="rounded-lg px-4 py-3 text-base font-semibold transition-all hover:bg-accent/10 hover:text-accent [&.active]:bg-accent/15 [&.active]:text-accent"
               onClick={() => setMobileMenuOpen(false)}
             >
               Home
             </Link>
             <Link
               to="/photos"
-              className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent py-2"
+              className="rounded-lg px-4 py-3 text-base font-semibold transition-all hover:bg-accent/10 hover:text-accent [&.active]:bg-accent/15 [&.active]:text-accent"
               onClick={() => setMobileMenuOpen(false)}
             >
               Photo Gallery
             </Link>
             <Link
               to="/videos"
-              className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent py-2"
+              className="rounded-lg px-4 py-3 text-base font-semibold transition-all hover:bg-accent/10 hover:text-accent [&.active]:bg-accent/15 [&.active]:text-accent"
               onClick={() => setMobileMenuOpen(false)}
             >
               Video Gallery
             </Link>
             <Link
               to="/events"
-              className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent py-2"
+              className="rounded-lg px-4 py-3 text-base font-semibold transition-all hover:bg-accent/10 hover:text-accent [&.active]:bg-accent/15 [&.active]:text-accent"
               onClick={() => setMobileMenuOpen(false)}
             >
               Events
             </Link>
             <Link
               to="/special-moments"
-              className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent py-2"
+              className="rounded-lg px-4 py-3 text-base font-semibold transition-all hover:bg-accent/10 hover:text-accent [&.active]:bg-accent/15 [&.active]:text-accent"
               onClick={() => setMobileMenuOpen(false)}
             >
               Special Moments
             </Link>
             <Link
               to="/business-info"
-              className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent py-2"
+              className="rounded-lg px-4 py-3 text-base font-semibold transition-all hover:bg-accent/10 hover:text-accent [&.active]:bg-accent/15 [&.active]:text-accent"
               onClick={() => setMobileMenuOpen(false)}
             >
-              About
+              Contact
             </Link>
             {showAdminLink && (
               <Link
                 to="/admin"
-                className="text-sm font-semibold transition-all hover:text-accent [&.active]:text-accent py-2"
+                className="rounded-lg px-4 py-3 text-base font-semibold transition-all hover:bg-primary/10 hover:text-primary [&.active]:bg-primary/15 [&.active]:text-primary"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Admin
               </Link>
             )}
-            <Button onClick={handleAuth} disabled={disabled} variant={isAuthenticated ? 'outline' : 'default'} className="mt-2 font-semibold">
-              {buttonText}
-            </Button>
+            <div className="mt-4 pt-4 border-t border-border/40">
+              <Button
+                onClick={() => {
+                  handleAuth();
+                  setMobileMenuOpen(false);
+                }}
+                disabled={disabled}
+                variant={isAuthenticated ? 'outline' : 'default'}
+                className={`w-full font-semibold transition-all ${
+                  isAuthenticated
+                    ? 'hover:bg-accent/10 hover:text-accent hover:border-accent/50'
+                    : 'bg-gradient-to-r from-accent to-primary hover:shadow-glow-md'
+                }`}
+              >
+                {buttonText}
+              </Button>
+            </div>
           </nav>
         </div>
       )}

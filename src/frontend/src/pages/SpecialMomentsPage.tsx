@@ -17,7 +17,7 @@ export default function SpecialMomentsPage() {
     <>
       <SEOHead page="specialMoments" />
       <div className="relative container mx-auto px-4 py-12 min-h-screen">
-        {/* Cinematic Background */}
+        {/* Vibrant Background */}
         <div className="absolute inset-0 pointer-events-none">
           <div 
             className="absolute inset-0 opacity-5"
@@ -29,8 +29,10 @@ export default function SpecialMomentsPage() {
         
         <div className="relative mb-12 animate-fade-in">
           <div className="flex items-center gap-4 mb-4">
-            <Sparkles className="h-14 w-14 text-accent" />
-            <h1 className="text-6xl font-bold tracking-tight md:text-7xl bg-gradient-to-br from-foreground via-accent to-primary bg-clip-text text-transparent">
+            <div className="rounded-xl bg-gradient-to-br from-accent/20 to-primary/20 p-3">
+              <Sparkles className="h-12 w-12 text-accent" />
+            </div>
+            <h1 className="text-6xl font-bold tracking-tight md:text-7xl gradient-heading">
               Special Moments
             </h1>
           </div>
@@ -38,7 +40,7 @@ export default function SpecialMomentsPage() {
         </div>
 
         {error && (
-          <div className="relative mb-8 p-5 glass-strong border border-destructive/50 rounded-xl">
+          <div className="relative mb-8 p-5 glass-strong border-2 border-destructive/60 rounded-xl">
             <p className="text-destructive font-medium text-lg">Error loading special moments. Please try refreshing the page.</p>
           </div>
         )}
@@ -51,12 +53,12 @@ export default function SpecialMomentsPage() {
             value={sortOrder}
             onValueChange={(value) => setSortOrder(value as SortedOrder)}
           >
-            <SelectTrigger className="w-[200px] glass transition-all hover:border-accent hover:shadow-glow-sm">
+            <SelectTrigger className="w-[200px] control-surface">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
-            <SelectContent className="glass-strong">
-              <SelectItem value={SortedOrder.newestFirst}>Newest First</SelectItem>
-              <SelectItem value={SortedOrder.oldestFirst}>Oldest First</SelectItem>
+            <SelectContent className="glass-strong border-accent/30">
+              <SelectItem value={SortedOrder.newestFirst} className="hover:bg-accent/10 focus:bg-accent/15">Newest First</SelectItem>
+              <SelectItem value={SortedOrder.oldestFirst} className="hover:bg-accent/10 focus:bg-accent/15">Oldest First</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -67,7 +69,7 @@ export default function SpecialMomentsPage() {
           </div>
         ) : specialMoments.length === 0 ? (
           <div className="relative flex min-h-[500px] flex-col items-center justify-center gap-8">
-            <div className="rounded-full bg-accent/15 p-10 shadow-glow-md">
+            <div className="rounded-full bg-gradient-to-br from-accent/20 to-primary/20 p-10 shadow-glow-md">
               <Sparkles className="h-24 w-24 text-accent" />
             </div>
             <p className="text-2xl text-muted-foreground font-medium">No special moments available yet.</p>
@@ -82,7 +84,7 @@ export default function SpecialMomentsPage() {
               return (
                 <Card 
                   key={moment.id.toString()} 
-                  className="overflow-hidden glass transition-all hover:shadow-glow-lg hover-lift animate-fade-in"
+                  className="overflow-hidden glass transition-all hover:shadow-glow-lg hover-lift animate-fade-in border-accent/20"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   {thumbnailUrl ? (
@@ -116,7 +118,7 @@ export default function SpecialMomentsPage() {
                       <span className="font-medium">{moment.images.length} {moment.images.length === 1 ? 'image' : 'images'}</span>
                     </div>
                     <Link to="/special-moments/$specialMomentId" params={{ specialMomentId: moment.id.toString() }}>
-                      <Button className="w-full transition-all hover:shadow-glow-sm font-semibold text-base py-6">
+                      <Button className="w-full bg-gradient-to-r from-accent to-primary hover:shadow-glow-sm font-semibold text-base py-6">
                         View Gallery
                       </Button>
                     </Link>

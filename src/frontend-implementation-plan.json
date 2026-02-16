@@ -1,70 +1,183 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Admin Orders: status lifecycle management, filtering, and guarded access",
+  "title": "Refresh UI theme with a colorful, modern palette and consistent styling across all sections",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Ensure Orders management is discoverable in the Admin Panel for admins and inaccessible to non-admin users.",
+      "summary": "Replace the global Tailwind/CSS theme tokens with a modern, colorful palette (not predominantly blue/purple) that works consistently in light and dark mode.",
       "acceptanceCriteria": [
-        "When logged in as an admin, the Admin Panel displays an \"Orders\" tab and selecting it shows the Orders management UI.",
-        "When logged in as a non-admin, Orders management UI cannot be accessed (direct navigation or UI entry points) and the user sees the existing non-admin access helper experience on the Admin page.",
-        "User-facing labels and messages in the Orders UI are in English."
+        "Light mode and dark mode both have clearly distinct, colorful primary/accent colors (not predominantly blue/purple).",
+        "Primary, accent, muted, border, and ring colors remain readable and accessible (no low-contrast text on backgrounds).",
+        "No backend changes are required for the styling update."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/AdminPage.tsx",
+          "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Confirm/adjust Admin Panel tab label to \"Orders\" and ensure OrdersSection is only rendered for admin users (maintain the existing non-admin helper experience on /admin)."
+          "description": "Update CSS theme tokens (background/foreground/card/popover/primary/accent/muted/border/ring/chart) to a more colorful, modern identity that avoids blue/purple as the dominant hues; ensure both :root and .dark are updated and remain readable."
         },
         {
-          "path": "frontend/src/components/Header.tsx",
+          "path": "frontend/tailwind.config.js",
           "operation": "modify",
-          "description": "Ensure the top-level navigation only exposes the Admin entry point to admins (and does not introduce any Orders-specific navigation for non-admin users)."
+          "description": "Adjust Tailwind theme extensions (e.g., glow shadow definitions and any theme-linked utilities) to better match the refreshed palette while continuing to reference the CSS tokens."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Add order status lifecycle management in the Orders section with status filtering and quick status actions for admins.",
+      "summary": "Apply the refreshed styling consistently across Header, Footer, major public pages, and Admin by standardizing section headers, cards, and CTA styling (gradients, accent borders, hover/focus states).",
       "acceptanceCriteria": [
-        "Backend Order data includes a status field and persists it for each order.",
-        "Admins can create an order and it defaults to a defined initial status (e.g., Pending).",
-        "Admins can update an order’s status without changing the immutable order id and existing order date.",
-        "Orders list UI provides a status filter and the list updates accordingly.",
-        "Admins can mark an order as Fulfilled or Cancelled from the Orders section UI and the change is reflected after refresh/reload."
+        "All main pages render with a cohesive, colorful look (section headings use consistent gradient treatment; cards/containers use consistent accent/border/shadow language).",
+        "Header and Footer visually match the new theme (nav active/hover states and icons reflect the updated accent/primary colors).",
+        "Interactive elements (buttons, links) have clear hover, active, and focus-visible styles that match the new theme."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/admin/OrdersSection.tsx",
+          "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Extend the existing Orders management UI to display the current order status, add a status filter (e.g., All/Pending/Fulfilled/Cancelled), and add quick actions to mark an order as Fulfilled or Cancelled using the new status-update mutation hook. Keep all user-facing text in English. Verify the component's usage instructions before implementing."
+          "description": "Add/adjust shared utilities for a consistent design language (e.g., standardized gradient heading treatment, section background overlays, card surfaces, CTA surfaces, and hover/focus-visible patterns) using Tailwind layers without touching shadcn UI component sources."
         },
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/components/Header.tsx",
           "operation": "modify",
-          "description": "Add React Query hooks to support filtering orders by status and mutating order status, and wire them so the Orders list refetches/updates after a status change. Verify the component's usage instructions before implementing."
+          "description": "Update header styling to better express the new palette: stronger colorful brand mark, improved nav hover/active treatments, and clearer focus-visible styling for navigation and auth button while keeping current layout/behavior."
+        },
+        {
+          "path": "frontend/src/components/Footer.tsx",
+          "operation": "modify",
+          "description": "Align footer styling with the updated theme (social icon hover states, separators, accent highlights, and CTA-like contact link treatment) to match header and page sections."
+        },
+        {
+          "path": "frontend/src/pages/HomePage.tsx",
+          "operation": "modify",
+          "description": "Apply the standardized section heading, card, and CTA treatments (gradient headings, accent borders, cohesive shadows/hover lifts) so the home hero/services/CTA sections match the refreshed theme consistently."
+        },
+        {
+          "path": "frontend/src/pages/PhotosPage.tsx",
+          "operation": "modify",
+          "description": "Update gallery section header, sort control container, and photo cards to use the same colorful gradients/accent borders/hover states as other sections, keeping existing layout and functionality."
+        },
+        {
+          "path": "frontend/src/pages/VideosPage.tsx",
+          "operation": "modify",
+          "description": "Refresh video page heading, sort controls, video cards, and the video modal styling so they match the new colorful theme with consistent hover/focus and surface treatments."
+        },
+        {
+          "path": "frontend/src/pages/EventsPage.tsx",
+          "operation": "modify",
+          "description": "Make the Events page consistent with the new theme: section heading treatment, select styling wrapper, card surfaces, and protected-state visuals (badge/icon) using the updated palette."
+        },
+        {
+          "path": "frontend/src/pages/SpecialMomentsPage.tsx",
+          "operation": "modify",
+          "description": "Apply the new theme consistently to Special Moments: gradient heading, cards, and CTAs with accent borders and hover/focus states aligned to the updated design language."
+        },
+        {
+          "path": "frontend/src/pages/BusinessInfoPage.tsx",
+          "operation": "modify",
+          "description": "Update Business Info section headers and service cards to use the same colorful, cohesive surface styling and spacing rhythm used across other public pages."
+        },
+        {
+          "path": "frontend/src/pages/AdminPage.tsx",
+          "operation": "modify",
+          "description": "Ensure the Admin page container/sections adopt the same theme direction (headings, surfaces, spacing, and consistent colorful accents) so it no longer feels visually separate from public pages."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Add/align React Query hooks and TypeScript types to support order status updates and ensure orders UI compiles without any casts.",
+      "summary": "Improve the visual styling of key options/controls (selects, badges, filters, and admin form controls) with better spacing and clear hover/selected/disabled/error states while maintaining usability.",
       "acceptanceCriteria": [
-        "All new backend order mutation methods (status changes) trap or reject when called by non-admin principals.",
-        "Frontend uses React Query hooks to call the new backend methods and invalidates/refetches the orders list after successful mutations.",
-        "TypeScript types for Order/status and request payloads are updated so the OrdersSection compiles without `any` casts."
+        "Select controls (trigger and dropdown content) have improved styling and clearly visible selected/hover states.",
+        "Badges (e.g., Protected) and status indicators use a more vibrant, theme-consistent color treatment while staying readable.",
+        "Form inputs in admin areas visibly communicate focus and error states with theme-consistent colors and rings."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Implement status-focused hooks following existing patterns (query keys, enabled flags, and query invalidation). Add a status update mutation hook that invalidates the relevant orders queries on success, and add a status-based orders query hook that can be driven by the OrdersSection filter UI."
+          "description": "Introduce/adjust global utility classes that can be applied from usage sites to standardize control surfaces (select triggers/menus), badges/status chips, and form field focus/error ring treatments—without editing any files under frontend/src/components/ui."
+        },
+        {
+          "path": "frontend/src/pages/EventsPage.tsx",
+          "operation": "modify",
+          "description": "Enhance SelectTrigger/SelectContent styling via className composition for clearer hover/selected states, and refine the Protected badge styling to be more vibrant yet readable under both themes."
+        },
+        {
+          "path": "frontend/src/pages/PhotosPage.tsx",
+          "operation": "modify",
+          "description": "Refine the photo sort Select styling (trigger/menu) to match the enhanced control styling and ensure focus-visible states are clearly indicated."
+        },
+        {
+          "path": "frontend/src/pages/VideosPage.tsx",
+          "operation": "modify",
+          "description": "Refine the video sort Select styling (trigger/menu) and ensure modal interactive controls are consistent with the updated focus/hover language."
+        },
+        {
+          "path": "frontend/src/pages/SpecialMomentsPage.tsx",
+          "operation": "modify",
+          "description": "Refine the special moments sort Select styling to adopt the improved colorful control surface and state styling."
         },
         {
           "path": "frontend/src/components/admin/OrdersSection.tsx",
           "operation": "modify",
-          "description": "Update OrdersSection to use the typed OrderStatus/UpdateOrderStatusRequest types (no any casts), call the new status mutation hook, and ensure it properly refetches/reflects status changes after mutation and after page refresh."
+          "description": "Update admin form controls and interactive options (filters/selects/inputs/buttons inside this section) by composing className props to improve spacing and to clearly show hover/focus-visible/error states using theme-consistent colors."
+        },
+        {
+          "path": "frontend/src/components/admin/EventManagementSection.tsx",
+          "operation": "modify",
+          "description": "Enhance admin event management controls (forms, selects, status indicators, destructive actions) with theme-consistent focus/error rings and more vibrant option styling via className composition."
+        },
+        {
+          "path": "frontend/src/components/admin/PhotoUploadSection.tsx",
+          "operation": "modify",
+          "description": "Improve upload section controls (file pickers/actions/progress areas) with more colorful, readable status styling and clearer button/option states using theme utilities and composed className."
+        },
+        {
+          "path": "frontend/src/components/admin/VideoUploadSection.tsx",
+          "operation": "modify",
+          "description": "Enhance video upload/admin controls styling (inputs, buttons, progress/status) to follow the same colorful option/control treatment and accessible focus/error states."
+        },
+        {
+          "path": "frontend/src/components/admin/FooterEditSection.tsx",
+          "operation": "modify",
+          "description": "Improve Footer edit form controls (inputs/textareas/buttons) with consistent spacing and theme-aligned focus/error rings and button hierarchy via className composition."
+        },
+        {
+          "path": "frontend/src/components/admin/VisitorsSection.tsx",
+          "operation": "modify",
+          "description": "Refine table controls/pagination options styling so interactive elements have clear hover/active/focus states and match the new palette."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Define and enforce a single coherent visual direction (colors, typography emphasis, spacing rhythm, gradients, shadows) so all sections—including Admin—feel intentionally designed and consistent.",
+      "acceptanceCriteria": [
+        "A single, consistent design language is evident across pages (same gradient style, same card treatment, same button hierarchy).",
+        "No page looks “unstyled” or visually inconsistent relative to the others (especially Admin vs public pages)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Consolidate the design language into reusable utility patterns (consistent heading gradients, surface treatments, shadow/glow levels, spacing rhythm helpers, and hover-lift behavior) that can be applied across pages/components."
+        },
+        {
+          "path": "frontend/src/components/PhotoActions.tsx",
+          "operation": "modify",
+          "description": "Align action buttons/controls styling with the unified theme (button hierarchy, hover/focus-visible states, and icon color accents) to ensure consistent interaction styling inside cards/viewers."
+        },
+        {
+          "path": "frontend/src/components/EventPasswordPrompt.tsx",
+          "operation": "modify",
+          "description": "Update the protected-event password prompt modal styling to match the unified theme direction (surface, accent border, focus rings, and CTA button hierarchy) while preserving existing behavior."
+        },
+        {
+          "path": "frontend/src/components/AdminAccessHelper.tsx",
+          "operation": "modify",
+          "description": "Restyle the admin access helper screen to match the same heading, surface, and CTA patterns as public pages so the Admin experience feels cohesive."
         }
       ]
     }

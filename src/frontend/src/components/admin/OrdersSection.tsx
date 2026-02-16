@@ -129,22 +129,22 @@ export default function OrdersSection() {
     switch (status) {
       case OrderStatus.Pending:
         return (
-          <Badge variant="outline" className="gap-1 border-yellow-500/50 text-yellow-500">
-            <Clock className="h-3 w-3" />
+          <Badge className="badge-pending gap-1.5 px-3 py-1.5 text-sm font-semibold">
+            <Clock className="h-4 w-4" />
             Pending
           </Badge>
         );
       case OrderStatus.Fulfilled:
         return (
-          <Badge variant="outline" className="gap-1 border-green-500/50 text-green-500">
-            <CheckCircle2 className="h-3 w-3" />
+          <Badge className="badge-fulfilled gap-1.5 px-3 py-1.5 text-sm font-semibold">
+            <CheckCircle2 className="h-4 w-4" />
             Fulfilled
           </Badge>
         );
       case OrderStatus.Cancelled:
         return (
-          <Badge variant="outline" className="gap-1 border-red-500/50 text-red-500">
-            <XCircle className="h-3 w-3" />
+          <Badge className="badge-cancelled gap-1.5 px-3 py-1.5 text-sm font-semibold">
+            <XCircle className="h-4 w-4" />
             Cancelled
           </Badge>
         );
@@ -161,16 +161,16 @@ export default function OrdersSection() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <Card className="glass-strong border-accent/20">
+      <Card className="glass-strong border-accent/30 shadow-lg">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="text-2xl">Orders Management</CardTitle>
+              <CardTitle className="text-3xl gradient-heading">Orders Management</CardTitle>
               <CardDescription className="text-base mt-2">
                 Manage orders with status tracking and lifecycle management
               </CardDescription>
             </div>
-            <Button onClick={openCreateDialog} className="gap-2">
+            <Button onClick={openCreateDialog} className="gap-2 bg-gradient-to-r from-accent to-primary hover:shadow-glow-md font-semibold">
               <Plus className="h-4 w-4" />
               Create Order
             </Button>
@@ -179,16 +179,16 @@ export default function OrdersSection() {
         <CardContent>
           {/* Status Filter */}
           <div className="mb-6">
-            <Label className="text-sm font-medium mb-3 block">Filter by Status</Label>
-            <div className="flex flex-wrap gap-2">
+            <Label className="text-sm font-semibold mb-3 block">Filter by Status</Label>
+            <div className="flex flex-wrap gap-3">
               <Button
                 variant={statusFilter === null ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setStatusFilter(null)}
-                className="gap-2"
+                className={`gap-2 font-semibold ${statusFilter === null ? 'bg-gradient-to-r from-accent to-primary' : 'hover:border-accent/50'}`}
               >
                 All Orders
-                <Badge variant="secondary" className="ml-1">
+                <Badge variant="secondary" className="ml-1 bg-accent/20">
                   {orders.length}
                 </Badge>
               </Button>
@@ -196,11 +196,11 @@ export default function OrdersSection() {
                 variant={statusFilter === OrderStatus.Pending ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setStatusFilter(OrderStatus.Pending)}
-                className="gap-2"
+                className={`gap-2 font-semibold ${statusFilter === OrderStatus.Pending ? 'bg-gradient-to-r from-accent to-primary' : 'hover:border-accent/50'}`}
               >
-                <Clock className="h-3 w-3" />
+                <Clock className="h-3.5 w-3.5" />
                 Pending
-                <Badge variant="secondary" className="ml-1">
+                <Badge variant="secondary" className="ml-1 bg-amber-500/20">
                   {orders.filter((o) => o.status === OrderStatus.Pending).length}
                 </Badge>
               </Button>
@@ -208,11 +208,11 @@ export default function OrdersSection() {
                 variant={statusFilter === OrderStatus.Fulfilled ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setStatusFilter(OrderStatus.Fulfilled)}
-                className="gap-2"
+                className={`gap-2 font-semibold ${statusFilter === OrderStatus.Fulfilled ? 'bg-gradient-to-r from-accent to-primary' : 'hover:border-accent/50'}`}
               >
-                <CheckCircle2 className="h-3 w-3" />
+                <CheckCircle2 className="h-3.5 w-3.5" />
                 Fulfilled
-                <Badge variant="secondary" className="ml-1">
+                <Badge variant="secondary" className="ml-1 bg-emerald-500/20">
                   {orders.filter((o) => o.status === OrderStatus.Fulfilled).length}
                 </Badge>
               </Button>
@@ -220,11 +220,11 @@ export default function OrdersSection() {
                 variant={statusFilter === OrderStatus.Cancelled ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setStatusFilter(OrderStatus.Cancelled)}
-                className="gap-2"
+                className={`gap-2 font-semibold ${statusFilter === OrderStatus.Cancelled ? 'bg-gradient-to-r from-accent to-primary' : 'hover:border-accent/50'}`}
               >
-                <XCircle className="h-3 w-3" />
+                <XCircle className="h-3.5 w-3.5" />
                 Cancelled
-                <Badge variant="secondary" className="ml-1">
+                <Badge variant="secondary" className="ml-1 bg-rose-500/20">
                   {orders.filter((o) => o.status === OrderStatus.Cancelled).length}
                 </Badge>
               </Button>
@@ -244,13 +244,13 @@ export default function OrdersSection() {
           ) : (
             <div className="space-y-4">
               {orders.map((order) => (
-                <Card key={order.id.toString()} className="glass border-accent/10">
+                <Card key={order.id.toString()} className="glass border-accent/20 hover:border-accent/40 transition-all">
                   <CardContent className="pt-6">
                     <div className="flex items-start justify-between">
                       <div className="space-y-3 flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           {getStatusBadge(order.status)}
-                          <span className="text-xs text-muted-foreground">Order #{order.id.toString()}</span>
+                          <span className="text-xs text-muted-foreground font-medium">Order #{order.id.toString()}</span>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
@@ -287,42 +287,41 @@ export default function OrdersSection() {
                           <div className="flex gap-2 pt-2">
                             <Button
                               size="sm"
-                              variant="outline"
                               onClick={() => handleUpdateOrderStatus(order.id, OrderStatus.Fulfilled)}
                               disabled={updateOrderStatusMutation.isPending}
-                              className="gap-2 text-green-500 border-green-500/50 hover:bg-green-500/10"
+                              className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
                             >
-                              <CheckCircle2 className="h-3 w-3" />
-                              Mark as Fulfilled
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                              Mark Fulfilled
                             </Button>
                             <Button
                               size="sm"
                               variant="outline"
                               onClick={() => handleUpdateOrderStatus(order.id, OrderStatus.Cancelled)}
                               disabled={updateOrderStatusMutation.isPending}
-                              className="gap-2 text-red-500 border-red-500/50 hover:bg-red-500/10"
+                              className="gap-1.5 border-rose-500/50 text-rose-600 hover:bg-rose-500/10 font-semibold"
                             >
-                              <XCircle className="h-3 w-3" />
-                              Mark as Cancelled
+                              <XCircle className="h-3.5 w-3.5" />
+                              Cancel
                             </Button>
                           </div>
                         )}
                       </div>
                       <div className="flex gap-2 ml-4">
                         <Button
+                          size="sm"
                           variant="outline"
-                          size="icon"
                           onClick={() => openEditDialog(order)}
-                          className="glass"
+                          className="hover:bg-accent/10 hover:border-accent/50"
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
+                          size="sm"
                           variant="outline"
-                          size="icon"
                           onClick={() => handleDeleteOrder(order.id)}
                           disabled={deleteOrderMutation.isPending}
-                          className="glass hover:bg-destructive/10 hover:text-destructive"
+                          className="hover:bg-destructive/10 hover:border-destructive/50 hover:text-destructive"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -338,77 +337,81 @@ export default function OrdersSection() {
 
       {/* Create Order Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="glass-strong border-accent/20">
+        <DialogContent className="glass-strong border-accent/30">
           <DialogHeader>
-            <DialogTitle>Create New Order</DialogTitle>
-            <DialogDescription>Add a new order with order date and fulfill date</DialogDescription>
+            <DialogTitle className="text-2xl gradient-heading">Create New Order</DialogTitle>
+            <DialogDescription className="text-base">
+              Fill in the order details below
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="create-order-date">Order Date *</Label>
+              <Label htmlFor="orderDate" className="font-semibold">Order Date *</Label>
               <Input
-                id="create-order-date"
+                id="orderDate"
                 type="date"
                 value={formData.orderDate}
                 onChange={(e) => setFormData({ ...formData, orderDate: e.target.value })}
-                className="glass"
+                className="control-surface"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="create-fulfill-date">Fulfill Date *</Label>
+              <Label htmlFor="fulfillDate" className="font-semibold">Fulfill Date *</Label>
               <Input
-                id="create-fulfill-date"
+                id="fulfillDate"
                 type="date"
                 value={formData.fulfillDate}
                 onChange={(e) => setFormData({ ...formData, fulfillDate: e.target.value })}
-                className="glass"
+                className="control-surface"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="create-customer-name">Customer Name (Optional)</Label>
+              <Label htmlFor="customerName" className="font-semibold">Customer Name</Label>
               <Input
-                id="create-customer-name"
-                type="text"
+                id="customerName"
                 value={formData.customerName}
                 onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
                 placeholder="Enter customer name"
-                className="glass"
+                className="control-surface"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="create-dvd">Number of DVDs</Label>
+                <Label htmlFor="numberOfDvd" className="font-semibold">Number of DVDs</Label>
                 <Input
-                  id="create-dvd"
+                  id="numberOfDvd"
                   type="number"
                   min="0"
                   value={formData.numberOfDvd}
                   onChange={(e) => setFormData({ ...formData, numberOfDvd: e.target.value })}
                   placeholder="0"
-                  className="glass"
+                  className="control-surface"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="create-prints">Number of Prints</Label>
+                <Label htmlFor="numberOfPrints" className="font-semibold">Number of Prints</Label>
                 <Input
-                  id="create-prints"
+                  id="numberOfPrints"
                   type="number"
                   min="0"
                   value={formData.numberOfPrints}
                   onChange={(e) => setFormData({ ...formData, numberOfPrints: e.target.value })}
                   placeholder="0"
-                  className="glass"
+                  className="control-surface"
                 />
               </div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="glass">
+            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="hover:border-accent/50">
               Cancel
             </Button>
-            <Button onClick={handleCreateOrder} disabled={createOrderMutation.isPending}>
-              {createOrderMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Order
+            <Button
+              onClick={handleCreateOrder}
+              disabled={createOrderMutation.isPending}
+              className="bg-gradient-to-r from-accent to-primary hover:shadow-glow-md font-semibold"
+            >
+              {createOrderMutation.isPending ? 'Creating...' : 'Create Order'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -416,77 +419,69 @@ export default function OrdersSection() {
 
       {/* Edit Order Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="glass-strong border-accent/20">
+        <DialogContent className="glass-strong border-accent/30">
           <DialogHeader>
-            <DialogTitle>Edit Order</DialogTitle>
-            <DialogDescription>Update order details</DialogDescription>
+            <DialogTitle className="text-2xl gradient-heading">Edit Order</DialogTitle>
+            <DialogDescription className="text-base">
+              Update the order details below
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-order-date">Order Date (Read-only)</Label>
+              <Label htmlFor="edit-fulfillDate" className="font-semibold">Fulfill Date</Label>
               <Input
-                id="edit-order-date"
-                type="date"
-                value={formData.orderDate}
-                disabled
-                className="glass opacity-60"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-fulfill-date">Fulfill Date</Label>
-              <Input
-                id="edit-fulfill-date"
+                id="edit-fulfillDate"
                 type="date"
                 value={formData.fulfillDate}
                 onChange={(e) => setFormData({ ...formData, fulfillDate: e.target.value })}
-                className="glass"
+                className="control-surface"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="edit-customer-name">Customer Name</Label>
+              <Label htmlFor="edit-customerName" className="font-semibold">Customer Name</Label>
               <Input
-                id="edit-customer-name"
-                type="text"
+                id="edit-customerName"
                 value={formData.customerName}
                 onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
                 placeholder="Enter customer name"
-                className="glass"
+                className="control-surface"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-dvd">Number of DVDs</Label>
+                <Label htmlFor="edit-numberOfDvd" className="font-semibold">Number of DVDs</Label>
                 <Input
-                  id="edit-dvd"
+                  id="edit-numberOfDvd"
                   type="number"
                   min="0"
                   value={formData.numberOfDvd}
                   onChange={(e) => setFormData({ ...formData, numberOfDvd: e.target.value })}
-                  placeholder="0"
-                  className="glass"
+                  className="control-surface"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-prints">Number of Prints</Label>
+                <Label htmlFor="edit-numberOfPrints" className="font-semibold">Number of Prints</Label>
                 <Input
-                  id="edit-prints"
+                  id="edit-numberOfPrints"
                   type="number"
                   min="0"
                   value={formData.numberOfPrints}
                   onChange={(e) => setFormData({ ...formData, numberOfPrints: e.target.value })}
-                  placeholder="0"
-                  className="glass"
+                  className="control-surface"
                 />
               </div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="glass">
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="hover:border-accent/50">
               Cancel
             </Button>
-            <Button onClick={handleUpdateOrder} disabled={updateOrderMutation.isPending}>
-              {updateOrderMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Update Order
+            <Button
+              onClick={handleUpdateOrder}
+              disabled={updateOrderMutation.isPending}
+              className="bg-gradient-to-r from-accent to-primary hover:shadow-glow-md font-semibold"
+            >
+              {updateOrderMutation.isPending ? 'Updating...' : 'Update Order'}
             </Button>
           </DialogFooter>
         </DialogContent>

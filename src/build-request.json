@@ -1,93 +1,90 @@
 {
   "kind": "build_request",
-  "title": "Add full order management in Orders section",
+  "title": "Make all website sections and options more colorful and visually appealing",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Ensure the Orders section is clearly discoverable and accessible for administrators: the Admin Panel must include an \"Orders\" tab and render the existing Orders management UI when selected, and non-admin users must not be able to access Orders management screens.",
+      "text": "Update the global Tailwind/CSS theme tokens to use a more colorful, modern palette (without relying on blue/purple as the main identity colors) and ensure the palette works consistently in both light and dark mode across all pages.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-1"
         ],
         "quotes": [
-          "Add full order managment in order section"
+          "All the section and option in my website make them some colourfull and good looking"
         ]
       },
       "acceptanceCriteria": [
-        "When logged in as an admin, the Admin Panel displays an \"Orders\" tab and selecting it shows the Orders management UI.",
-        "When logged in as a non-admin, Orders management UI cannot be accessed (direct navigation or UI entry points) and the user sees the existing non-admin access helper experience on the Admin page.",
-        "User-facing labels and messages in the Orders UI are in English."
+        "Light mode and dark mode both have clearly distinct, colorful primary/accent colors (not predominantly blue/purple).",
+        "Primary, accent, muted, border, and ring colors remain readable and accessible (no low-contrast text on backgrounds).",
+        "No backend changes are required for the styling update."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Implement \"full order management\" capabilities in the Orders section by adding an order lifecycle status and management actions: store an order status (at minimum: Pending, Fulfilled, Cancelled), allow admins to update the status, and add UI controls to filter the orders list by status and quickly mark an order as Fulfilled/Cancelled.",
-      "target": "both",
+      "text": "Apply the refreshed colorful styling consistently across all major site sections (Header, Footer, Home, Photos, Videos, Events, Special Moments, Business Info, and Admin) by improving section headers, cards, and call-to-action areas using gradients, accent borders, and hover/focus states.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-1"
         ],
         "quotes": [
-          "Add full order managment in order section"
+          "All the section and option in my website make them some colourfull and good looking"
         ]
       },
       "acceptanceCriteria": [
-        "Backend Order data includes a status field and persists it for each order.",
-        "Admins can create an order and it defaults to a defined initial status (e.g., Pending).",
-        "Admins can update an order’s status without changing the immutable order id and existing order date.",
-        "Orders list UI provides a status filter and the list updates accordingly.",
-        "Admins can mark an order as Fulfilled or Cancelled from the Orders section UI and the change is reflected after refresh/reload."
+        "All main pages render with a cohesive, colorful look (section headings use consistent gradient treatment; cards/containers use consistent accent/border/shadow language).",
+        "Header and Footer visually match the new theme (nav active/hover states and icons reflect the updated accent/primary colors).",
+        "Interactive elements (buttons, links) have clear hover, active, and focus-visible styles that match the new theme."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Add necessary backend canister methods and React Query hooks (following existing patterns) to support the new order status field and status update operations, enforcing admin-only access for mutations and appropriate access for queries used by the admin UI.",
-      "target": "both",
+      "text": "Make all key “options” and controls (Select dropdown triggers/menus, badges, filters, tabs if present, and admin form controls) more visually appealing by enhancing color, spacing, and state styling (hover/selected/disabled/error) while keeping usability and readability high.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-1"
         ],
         "quotes": [
-          "Add full order managment in order section"
+          "All the section and option in my website make them some colourfull and good looking"
         ]
       },
       "acceptanceCriteria": [
-        "All new backend order mutation methods (status changes) trap or reject when called by non-admin principals.",
-        "Frontend uses React Query hooks to call the new backend methods and invalidates/refetches the orders list after successful mutations.",
-        "TypeScript types for Order/status and request payloads are updated so the OrdersSection compiles without `any` casts."
+        "Select controls (trigger and dropdown content) have improved styling and clearly visible selected/hover states.",
+        "Badges (e.g., Protected) and status indicators use a more vibrant, theme-consistent color treatment while staying readable.",
+        "Form inputs in admin areas visibly communicate focus and error states with theme-consistent colors and rings."
       ]
     },
     {
       "id": "REQ-4",
-      "text": "If adding order status changes the stable/persistent state shape, add a conditional Motoko migration to preserve existing deployed orders by initializing the new status field for all existing orders.",
-      "target": "backend",
+      "text": "Establish and enforce one coherent visual theme direction for the whole UI (colors, typography emphasis, spacing rhythm, gradients, and shadows) so the site feels intentionally designed and consistently “good looking” across sections.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-1"
         ],
         "quotes": [
-          "Add full order managment in order section"
+          "All the section and option in my website make them some colourfull and good looking"
         ]
       },
       "acceptanceCriteria": [
-        "Upgrading the canister does not erase existing orders.",
-        "All pre-existing orders receive a valid default status after upgrade.",
-        "Migration is conditional (only runs when upgrading from older state that lacks the new field)."
+        "A single, consistent design language is evident across pages (same gradient style, same card treatment, same button hierarchy).",
+        "No page looks “unstyled” or visually inconsistent relative to the others (especially Admin vs public pages)."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor with all logic in backend/main.mo.",
-    "Do not edit files under frontend immutable paths (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui).",
-    "Use English for all user-facing text."
+    "Do not edit files under frontend/src/components/ui (compose them via props/className and theme tokens instead).",
+    "Do not edit frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx (immutable paths).",
+    "Keep all changes within the existing React + Tailwind + shadcn setup; do not add new frameworks.",
+    "Do not introduce any new backend schema/state changes for this styling-only request."
   ],
   "nonGoals": [
-    "Do not add third-party authentication providers (only Internet Identity).",
-    "Do not add external databases or external backend services.",
-    "Do not implement real-time updates (no WebSockets/live subscriptions).",
-    "Do not add payments/invoicing unless explicitly requested."
+    "Adding new application features (e.g., new pages, new admin capabilities, new order logic).",
+    "Changing site content/copy beyond what is required for styling consistency.",
+    "Implementing third-party themes or external CSS frameworks."
   ],
   "imageRequirements": {
     "required": [],

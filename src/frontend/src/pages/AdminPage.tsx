@@ -37,98 +37,91 @@ export default function AdminPage() {
       <div className="container mx-auto px-4 py-20">
         <div className="absolute inset-0 bg-texture pointer-events-none" />
         <div className="relative mx-auto max-w-md">
-          <Alert className="glass-strong border-accent/50">
-            <Lock className="h-6 w-6 text-accent" />
+          <Alert className="glass-strong border-2 border-primary/60 shadow-glow-md">
+            <Lock className="h-6 w-6 text-primary" />
             <AlertTitle className="text-xl">Authentication Required</AlertTitle>
             <AlertDescription className="text-base">
               Please log in to access the admin panel.
             </AlertDescription>
           </Alert>
-          <div className="mt-8 flex gap-4">
-            <Button onClick={() => login()} className="flex-1 font-semibold">
-              Log In
-            </Button>
-            <Button onClick={() => navigate({ to: '/' })} variant="outline" className="flex-1 glass font-semibold">
-              Go Home
-            </Button>
-          </div>
+          <Button
+            onClick={() => login()}
+            className="mt-6 w-full bg-gradient-to-r from-accent to-primary hover:shadow-glow-md font-semibold"
+          >
+            Log In
+          </Button>
         </div>
       </div>
     );
   }
 
-  // Authenticated but not admin - show helper
+  // Not admin
   if (!isAdmin) {
     return (
-      <div className="container mx-auto px-4 py-12 min-h-screen">
+      <div className="container mx-auto px-4 py-12">
         <div className="absolute inset-0 bg-texture pointer-events-none" />
-        <div className="relative mx-auto max-w-3xl">
-          <div className="mb-8 animate-fade-in">
-            <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-br from-foreground to-accent bg-clip-text text-transparent mb-3">
-              Admin Panel Access
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              You need administrator privileges to access this section
-            </p>
-          </div>
-          <AdminAccessHelper />
-          <div className="mt-8">
-            <Button onClick={() => navigate({ to: '/' })} variant="outline" className="w-full glass font-semibold">
-              Return to Home
-            </Button>
-          </div>
-        </div>
+        <AdminAccessHelper />
       </div>
     );
   }
 
-  // Admin user - show admin panel
+  // Admin user
   return (
-    <div className="container mx-auto px-4 py-12 min-h-screen">
+    <div className="relative container mx-auto px-4 py-12 min-h-screen">
       <div className="absolute inset-0 bg-texture pointer-events-none" />
       
       <div className="relative mb-12 animate-fade-in">
-        <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-br from-foreground to-accent bg-clip-text text-transparent">
+        <h1 className="mb-4 text-5xl font-bold tracking-tight md:text-6xl gradient-heading">
           Admin Panel
         </h1>
-        <p className="mt-3 text-muted-foreground text-xl">Manage your photos, videos, events, special moments, orders, and site content</p>
+        <p className="text-muted-foreground text-xl">Manage your photography and videography business</p>
       </div>
-      <Tabs defaultValue="photos" className="relative w-full">
-        <TabsList className="grid w-full grid-cols-9 glass-strong h-auto p-1">
-          <TabsTrigger value="photos" className="font-semibold">Photos</TabsTrigger>
-          <TabsTrigger value="videos" className="font-semibold">Videos</TabsTrigger>
-          <TabsTrigger value="events" className="font-semibold">Events</TabsTrigger>
-          <TabsTrigger value="special-moments" className="font-semibold">Special Moments</TabsTrigger>
-          <TabsTrigger value="orders" className="font-semibold">Orders</TabsTrigger>
-          <TabsTrigger value="shortlists" className="font-semibold">Shortlists</TabsTrigger>
-          <TabsTrigger value="statistics" className="font-semibold">Statistics</TabsTrigger>
-          <TabsTrigger value="visitors" className="font-semibold">Visitors</TabsTrigger>
-          <TabsTrigger value="footer" className="font-semibold">Footer</TabsTrigger>
+
+      <Tabs defaultValue="photos" className="relative space-y-8">
+        <TabsList className="glass-strong border-accent/30 p-2 flex-wrap h-auto gap-2">
+          <TabsTrigger value="photos" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Photos</TabsTrigger>
+          <TabsTrigger value="videos" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Videos</TabsTrigger>
+          <TabsTrigger value="events" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Events</TabsTrigger>
+          <TabsTrigger value="special-moments" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Special Moments</TabsTrigger>
+          <TabsTrigger value="orders" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Orders</TabsTrigger>
+          <TabsTrigger value="shortlists" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Shortlists</TabsTrigger>
+          <TabsTrigger value="statistics" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Statistics</TabsTrigger>
+          <TabsTrigger value="visitors" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Visitors</TabsTrigger>
+          <TabsTrigger value="footer" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Footer</TabsTrigger>
         </TabsList>
+
         <TabsContent value="photos">
           <PhotoUploadSection />
         </TabsContent>
+
         <TabsContent value="videos">
           <VideoUploadSection />
         </TabsContent>
+
         <TabsContent value="events">
           <EventManagementSection />
         </TabsContent>
+
         <TabsContent value="special-moments">
           <SpecialMomentManagementSection />
         </TabsContent>
+
         <TabsContent value="orders">
           <OrdersSection />
         </TabsContent>
+
         <TabsContent value="shortlists">
           <ShortlistsSection />
         </TabsContent>
+
         <TabsContent value="statistics">
           <UserStatisticsSection />
         </TabsContent>
+
         <TabsContent value="visitors">
           <VisitorsSection />
         </TabsContent>
+
         <TabsContent value="footer">
           <FooterEditSection />
         </TabsContent>
