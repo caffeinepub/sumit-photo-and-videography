@@ -1,32 +1,26 @@
 import { createRouter, createRoute, createRootRoute, RouterProvider, Outlet } from '@tanstack/react-router';
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from '@/components/ui/sonner';
-import { useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
+import AdminPage from './pages/AdminPage';
 import PhotosPage from './pages/PhotosPage';
 import VideosPage from './pages/VideosPage';
-import AdminPage from './pages/AdminPage';
 import EventsPage from './pages/EventsPage';
-import EventDetailPage from './pages/EventDetailPage';
+import FavoritesPage from './pages/FavoritesPage';
+import PortfolioPage from './pages/PortfolioPage';
+import BusinessInfoPage from './pages/BusinessInfoPage';
 import SpecialMomentsPage from './pages/SpecialMomentsPage';
 import SpecialMomentPage from './pages/SpecialMomentPage';
-import BusinessInfoPage from './pages/BusinessInfoPage';
+import MediaGroupPage from './pages/MediaGroupPage';
+import EventDetailPage from './pages/EventDetailPage';
+import EventPage from './pages/EventPage';
+import PhotoDetailPage from './pages/PhotoDetailPage';
 import ProfileSetupModal from './components/ProfileSetupModal';
-import SitemapPage from './pages/SitemapPage';
-import RobotsPage from './pages/RobotsPage';
 import RouterNotFoundRedirect from './components/RouterNotFoundRedirect';
-import { useRecordVisitor } from './hooks/useQueries';
 
 function Layout() {
-  const recordVisitor = useRecordVisitor();
-
-  useEffect(() => {
-    // Record visitor when the app loads
-    recordVisitor.mutate();
-  }, []);
-
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -50,6 +44,12 @@ const indexRoute = createRoute({
   component: HomePage,
 });
 
+const adminRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/admin',
+  component: AdminPage,
+});
+
 const photosRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/photos',
@@ -68,22 +68,16 @@ const eventsRoute = createRoute({
   component: EventsPage,
 });
 
-const eventDetailRoute = createRoute({
+const favoritesRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/events/$eventId',
-  component: EventDetailPage,
+  path: '/favorites',
+  component: FavoritesPage,
 });
 
-const specialMomentsRoute = createRoute({
+const portfolioRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/special-moments',
-  component: SpecialMomentsPage,
-});
-
-const specialMomentDetailRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/special-moments/$specialMomentId',
-  component: SpecialMomentPage,
+  path: '/portfolio',
+  component: PortfolioPage,
 });
 
 const businessInfoRoute = createRoute({
@@ -92,36 +86,57 @@ const businessInfoRoute = createRoute({
   component: BusinessInfoPage,
 });
 
-const adminRoute = createRoute({
+const specialMomentsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/admin',
-  component: AdminPage,
+  path: '/special-moments',
+  component: SpecialMomentsPage,
 });
 
-const sitemapRoute = createRoute({
+const specialMomentRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/sitemap.xml',
-  component: SitemapPage,
+  path: '/special-moments/$id',
+  component: SpecialMomentPage,
 });
 
-const robotsRoute = createRoute({
+const mediaGroupRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/robots.txt',
-  component: RobotsPage,
+  path: '/media-group/$id',
+  component: MediaGroupPage,
+});
+
+const eventDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/events/$id',
+  component: EventDetailPage,
+});
+
+const eventRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/event/$id',
+  component: EventPage,
+});
+
+const photoDetailRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/photos/$id',
+  component: PhotoDetailPage,
 });
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
+  adminRoute,
   photosRoute,
   videosRoute,
   eventsRoute,
-  eventDetailRoute,
-  specialMomentsRoute,
-  specialMomentDetailRoute,
+  favoritesRoute,
+  portfolioRoute,
   businessInfoRoute,
-  adminRoute,
-  sitemapRoute,
-  robotsRoute,
+  specialMomentsRoute,
+  specialMomentRoute,
+  mediaGroupRoute,
+  eventDetailRoute,
+  eventRoute,
+  photoDetailRoute,
 ]);
 
 const router = createRouter({ routeTree });

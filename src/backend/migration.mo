@@ -1,48 +1,124 @@
 import Map "mo:core/Map";
+import Time "mo:core/Time";
 import Nat "mo:core/Nat";
+import Principal "mo:core/Principal";
+import Storage "blob-storage/Storage";
 
 module {
-  // Old order type (without status)
-  type OldOrder = {
-    id : Nat;
-    orderDate : Int;
-    fulfillDate : Int;
-    customerName : Text;
-    numberOfDvd : Nat;
-    numberOfPrints : Nat;
+  type OldPhoto = {
+    id : Text;
+    name : Text;
+    description : Text;
+    blob : Storage.ExternalBlob;
+    uploadTime : Time.Time;
+    likeCount : Nat;
   };
 
-  // Old actor state type (wet orders)
+  type Photo = {
+    id : Text;
+    name : Text;
+    description : Text;
+    blob : Storage.ExternalBlob;
+    uploadTime : Time.Time;
+    likeCount : Nat;
+    category : Text;
+  };
+
+  type OldEventImage = {
+    id : Text;
+    name : Text;
+    description : Text;
+    blob : Storage.ExternalBlob;
+    uploadTime : Time.Time;
+  };
+
+  type EventImage = {
+    id : Text;
+    name : Text;
+    description : Text;
+    blob : Storage.ExternalBlob;
+    uploadTime : Time.Time;
+    category : Text;
+  };
+
+  type OldEvent = {
+    id : Nat;
+    name : Text;
+    description : Text;
+    date : Time.Time;
+    images : Map.Map<Text, OldEventImage>;
+    password : ?Text;
+  };
+
+  type Event = {
+    id : Nat;
+    name : Text;
+    description : Text;
+    date : Time.Time;
+    images : Map.Map<Text, EventImage>;
+    password : ?Text;
+  };
+
+  type OldUserProfile = {
+    name : Text;
+  };
+
+  type UserProfile = {
+    name : Text;
+    email : Text;
+    address : Text;
+    phone : Text;
+  };
+
   type OldActor = {
-    orders : Map.Map<Nat, OldOrder>;
+    photos : Map.Map<Text, OldPhoto>;
+    events : Map.Map<Nat, OldEvent>;
+    userProfiles : Map.Map<Principal, OldUserProfile>;
   };
 
-  // Order with status (default Pending after migration)
-  type NewOrder = {
-    id : Nat;
-    orderDate : Int;
-    fulfillDate : Int;
-    customerName : Text;
-    numberOfDvd : Nat;
-    numberOfPrints : Nat;
-    status : { #Pending; #Fulfilled; #Cancelled };
-  };
-
-  // New actor state type
   type NewActor = {
-    orders : Map.Map<Nat, NewOrder>;
+    photos : Map.Map<Text, Photo>;
+    events : Map.Map<Nat, Event>;
+    userProfiles : Map.Map<Principal, UserProfile>;
   };
 
-  // Migration function
   public func run(old : OldActor) : NewActor {
-    let newOrders = old.orders.map<Nat, OldOrder, NewOrder>(
-      func(_id, oldOrder) {
+    let newPhotos = old.photos.map<Text, OldPhoto, Photo>(
+      func(_id, oldPhoto) {
+        { oldPhoto with category = "uncategorized" };
+      }
+    );
+
+    let newEvents = old.events.map<Nat, OldEvent, Event>(
+      func(_id, oldEvent) {
+        let newImages = oldEvent.images.map<Text, OldEventImage, EventImage>(
+          func(_imageId, oldImage) {
+            { oldImage with category = "uncategorized" };
+          }
+        );
         {
-          oldOrder with
-          status = #Pending;
+          oldEvent with
+          images = newImages;
         };
       }
     );
-    { orders = newOrders };
+
+    let newUserProfiles = old.userProfiles.map<Principal, OldUserProfile, UserProfile>(
+      func(_principal, oldProfile) {
+        {
+          oldProfile with
+          email = "unknown";
+          address = "unknown";
+          phone = "unknown";
+        };
+      }
+    );
+
+    {
+      old with
+      photos = newPhotos;
+      events = newEvents;
+      userProfiles = newUserProfiles;
+    };
   };
 };

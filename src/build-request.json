@@ -1,93 +1,106 @@
 {
   "kind": "build_request",
-  "title": "Make all website sections and options more colorful and visually appealing",
+  "title": "Restore Photos/Videos/Events sections alongside Orders",
+  "projectName": "Studio Portal",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the global Tailwind/CSS theme tokens to use a more colorful, modern palette (without relying on blue/purple as the main identity colors) and ensure the palette works consistently in both light and dark mode across all pages.",
+      "text": "Restore the application’s previously available top-level sections so the UI is not limited to the Orders admin section. At minimum, re-add working routes and pages for Photos, Videos, Events, and any related sections that previously existed in the app (e.g., Special Moments, Favorites, Portfolio, Business Info, Media Groups) so users can navigate to them again.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-5"
         ],
         "quotes": [
-          "All the section and option in my website make them some colourfull and good looking"
+          "You removed everything and only showing order section restore all the section like photos videos events etc as like previous"
         ]
       },
       "acceptanceCriteria": [
-        "Light mode and dark mode both have clearly distinct, colorful primary/accent colors (not predominantly blue/purple).",
-        "Primary, accent, muted, border, and ring colors remain readable and accessible (no low-contrast text on backgrounds).",
-        "No backend changes are required for the styling update."
+        "App routing includes dedicated routes (not placeholders) for Photos, Videos, and Events pages in addition to existing Home and Admin routes.",
+        "Navigating to the restored routes renders non-empty pages (not blank files) and does not redirect to Home due to notFound routing.",
+        "Header navigation provides visible links (or a menu) to reach the restored sections (Photos/Videos/Events at minimum) without needing to type URLs.",
+        "Orders admin section remains accessible at /admin and continues to function as-is."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Apply the refreshed colorful styling consistently across all major site sections (Header, Footer, Home, Photos, Videos, Events, Special Moments, Business Info, and Admin) by improving section headers, cards, and call-to-action areas using gradients, accent borders, and hover/focus states.",
+      "text": "Restore the content and UI structure for the restored sections (Photos, Videos, Events, etc.) so they resemble the previous multi-section experience rather than an order-only landing page. Ensure user-facing labels and messages are in English.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-5"
         ],
         "quotes": [
-          "All the section and option in my website make them some colourfull and good looking"
+          "restore all the section like photos videos events etc as like previous"
         ]
       },
       "acceptanceCriteria": [
-        "All main pages render with a cohesive, colorful look (section headings use consistent gradient treatment; cards/containers use consistent accent/border/shadow language).",
-        "Header and Footer visually match the new theme (nav active/hover states and icons reflect the updated accent/primary colors).",
-        "Interactive elements (buttons, links) have clear hover, active, and focus-visible styles that match the new theme."
+        "Home page is updated so it is not exclusively an “Order Management System” marketing page; it includes entry points to the restored sections (Photos/Videos/Events at minimum).",
+        "Each restored section page includes basic layout scaffolding (title, description, primary actions) and does not show empty/blank content.",
+        "All user-facing text introduced/updated by this change is in English."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Make all key “options” and controls (Select dropdown triggers/menus, badges, filters, tabs if present, and admin form controls) more visually appealing by enhancing color, spacing, and state styling (hover/selected/disabled/error) while keeping usability and readability high.",
-      "target": "frontend",
+      "text": "Restore backend support for the non-order sections (Photos, Videos, Events, Special Moments, Favorites/likes, shortlists, visitors, footer content as applicable) so the restored frontend sections can load and mutate data without runtime failures.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-5"
         ],
         "quotes": [
-          "All the section and option in my website make them some colourfull and good looking"
+          "restore all the section like photos videos events etc as like previous"
         ]
       },
       "acceptanceCriteria": [
-        "Select controls (trigger and dropdown content) have improved styling and clearly visible selected/hover states.",
-        "Badges (e.g., Protected) and status indicators use a more vibrant, theme-consistent color treatment while staying readable.",
-        "Form inputs in admin areas visibly communicate focus and error states with theme-consistent colors and rings."
+        "Backend exposes query and update methods needed by the restored sections (at minimum: list and get for Photos/Videos/Events; and admin-only create/upload/update/delete where applicable).",
+        "Access control is enforced consistently: public vs authenticated vs admin actions are protected appropriately (e.g., admin-only uploads/management).",
+        "The restored frontend sections can call the backend actor without throwing runtime traps for missing methods (e.g., “method not found”)."
       ]
     },
     {
       "id": "REQ-4",
-      "text": "Establish and enforce one coherent visual theme direction for the whole UI (colors, typography emphasis, spacing rhythm, gradients, and shadows) so the site feels intentionally designed and consistently “good looking” across sections.",
+      "text": "Restore admin panel navigation and sections beyond Orders (e.g., Photo upload/management, Video upload/management, Event management, Special moment management, Shortlists, Visitors, Footer editing, User statistics) so admins can manage all previously available content areas from the admin UI.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-5"
         ],
         "quotes": [
-          "All the section and option in my website make them some colourfull and good looking"
+          "restore all the section like photos videos events etc as like previous"
         ]
       },
       "acceptanceCriteria": [
-        "A single, consistent design language is evident across pages (same gradient style, same card treatment, same button hierarchy).",
-        "No page looks “unstyled” or visually inconsistent relative to the others (especially Admin vs public pages)."
+        "Admin page no longer renders only OrdersSection; it provides a way to access additional admin sections (tabs/side navigation/accordion is acceptable).",
+        "Each admin section that is currently an empty placeholder renders functional UI (not empty files), at least for listing existing entities and providing create/update/delete or upload flows where applicable.",
+        "Admin access checks remain in place; non-admin users still see the admin access helper flow."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/src/components/ui (compose them via props/className and theme tokens instead).",
-    "Do not edit frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx (immutable paths).",
-    "Keep all changes within the existing React + Tailwind + shadcn setup; do not add new frameworks.",
-    "Do not introduce any new backend schema/state changes for this styling-only request."
+    "Do not edit files under frontend/src/components/ui (Shadcn UI is read-only and must be composed, not modified).",
+    "Do not edit immutable hook entrypoints: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx.",
+    "Backend must remain a single Motoko actor in backend/main.mo; only add backend/migration.mo changes if an upgrade requires state migration.",
+    "Keep the existing Orders functionality working and accessible at /admin."
   ],
   "nonGoals": [
-    "Adding new application features (e.g., new pages, new admin capabilities, new order logic).",
-    "Changing site content/copy beyond what is required for styling consistency.",
-    "Implementing third-party themes or external CSS frameworks."
+    "Do not introduce third-party authentication providers (only Internet Identity is supported).",
+    "Do not add external databases or non-IC storage services.",
+    "Do not add real-time features such as WebSockets or push notifications."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

@@ -1,4 +1,4 @@
-import type { Time } from '../backend';
+import type { Time } from '../types/orders';
 
 /**
  * Convert HTML date input string (YYYY-MM-DD) to backend Time (nanoseconds)

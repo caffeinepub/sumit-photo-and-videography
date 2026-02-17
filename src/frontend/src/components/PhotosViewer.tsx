@@ -1,91 +1,38 @@
-import { useEffect } from 'react';
-import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { PhotoActions } from './PhotoActions';
-import type { Photo } from '../backend';
+import { Card, CardContent } from '@/components/ui/card';
+import { Camera } from 'lucide-react';
 
 interface PhotosViewerProps {
-  photo: Photo;
-  onClose: () => void;
+  photos?: any[];
+  emptyMessage?: string;
 }
 
-export default function PhotosViewer({ photo, onClose }: PhotosViewerProps) {
-  const imageUrl = photo.blob.getDirectURL();
-
-  // Handle escape key to close viewer
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
-
-  // Prevent body scroll when viewer is open
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, []);
+export default function PhotosViewer({ photos = [], emptyMessage = 'No photos available' }: PhotosViewerProps) {
+  if (photos.length === 0) {
+    return (
+      <Card>
+        <CardContent className="py-12">
+          <div className="flex flex-col items-center justify-center text-center">
+            <Camera className="h-16 w-16 text-muted-foreground mb-4" />
+            <p className="text-lg text-muted-foreground">
+              {emptyMessage}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm animate-fade-in"
-      onClick={onClose}
-    >
-      <div
-        className="relative max-w-7xl w-full mx-4 max-h-[90vh] flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Close Button */}
-        <Button
-          onClick={onClose}
-          size="icon"
-          variant="ghost"
-          className="absolute -top-12 right-0 z-10 h-10 w-10 rounded-full glass hover:shadow-glow-md transition-all"
-          aria-label="Close viewer"
-        >
-          <X className="h-6 w-6" />
-        </Button>
-
-        {/* Photo Container */}
-        <div className="glass-strong rounded-2xl overflow-hidden shadow-glow-lg flex-1 flex flex-col">
-          {/* Image */}
-          <div className="flex-1 flex items-center justify-center p-4 bg-black/20">
-            <img
-              src={imageUrl}
-              alt={photo.name}
-              className="max-w-full max-h-[60vh] object-contain rounded-lg"
-            />
-          </div>
-
-          {/* Photo Info */}
-          <div className="p-6 space-y-4 border-t border-border/50">
-            <div>
-              <h2 className="text-3xl font-bold tracking-tight mb-2 bg-gradient-to-br from-foreground via-accent to-primary bg-clip-text text-transparent">
-                {photo.name}
-              </h2>
-              {photo.description && (
-                <p className="text-lg text-muted-foreground leading-relaxed">
-                  {photo.description}
-                </p>
-              )}
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {photos.map((photo) => (
+        <Card key={photo.id} className="overflow-hidden">
+          <CardContent className="p-0">
+            <div className="aspect-square bg-muted flex items-center justify-center">
+              <Camera className="h-12 w-12 text-muted-foreground" />
             </div>
-
-            {/* Actions */}
-            <div className="flex items-center justify-between pt-2">
-              <PhotoActions photo={photo} variant="large" />
-              <p className="text-sm text-muted-foreground">
-                Press ESC to close
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }

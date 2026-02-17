@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useGetCallerUserProfile, useCreateNewAuthenticatedUser, useSaveCallerUserProfile } from '../hooks/useQueries';
+import { useGetCallerUserProfile, useSaveCallerUserProfile } from '../hooks/useQueries';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -10,29 +10,11 @@ import { toast } from 'sonner';
 export default function ProfileSetupModal() {
   const { identity } = useInternetIdentity();
   const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
-  const createUser = useCreateNewAuthenticatedUser();
   const saveProfile = useSaveCallerUserProfile();
   const [name, setName] = useState('');
-  const [isInitializing, setIsInitializing] = useState(false);
 
   const isAuthenticated = !!identity && !identity.getPrincipal().isAnonymous();
   const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
-
-  useEffect(() => {
-    if (showProfileSetup && !isInitializing) {
-      setIsInitializing(true);
-      createUser.mutate(undefined, {
-        onError: (error) => {
-          console.error('Failed to initialize user:', error);
-          toast.error('Failed to initialize user profile');
-          setIsInitializing(false);
-        },
-        onSuccess: () => {
-          setIsInitializing(false);
-        },
-      });
-    }
-  }, [showProfileSetup, isInitializing]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +24,12 @@ export default function ProfileSetupModal() {
     }
 
     saveProfile.mutate(
-      { name: name.trim() },
+      { 
+        name: name.trim(),
+        email: '',
+        address: '',
+        phone: '',
+      },
       {
         onSuccess: () => {
           toast.success('Profile created successfully!');
@@ -57,7 +44,7 @@ export default function ProfileSetupModal() {
   };
 
   return (
-    <Dialog open={showProfileSetup && !isInitializing}>
+    <Dialog open={showProfileSetup}>
       <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Welcome!</DialogTitle>

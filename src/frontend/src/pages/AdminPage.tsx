@@ -1,32 +1,32 @@
+import { useState } from 'react';
 import { useIsCallerAdmin } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Loader2, Lock } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import OrdersSection from '../components/admin/OrdersSection';
 import PhotoUploadSection from '../components/admin/PhotoUploadSection';
 import VideoUploadSection from '../components/admin/VideoUploadSection';
-import FooterEditSection from '../components/admin/FooterEditSection';
 import EventManagementSection from '../components/admin/EventManagementSection';
 import SpecialMomentManagementSection from '../components/admin/SpecialMomentManagementSection';
-import UserStatisticsSection from '../components/admin/UserStatisticsSection';
-import VisitorsSection from '../components/admin/VisitorsSection';
 import ShortlistsSection from '../components/admin/ShortlistsSection';
-import OrdersSection from '../components/admin/OrdersSection';
+import VisitorsSection from '../components/admin/VisitorsSection';
+import FooterEditSection from '../components/admin/FooterEditSection';
+import UserStatisticsSection from '../components/admin/UserStatisticsSection';
 import AdminAccessHelper from '../components/AdminAccessHelper';
-import { useNavigate } from '@tanstack/react-router';
 
 export default function AdminPage() {
   const { data: isAdmin, isLoading } = useIsCallerAdmin();
   const { identity, login } = useInternetIdentity();
-  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('orders');
 
   const isAuthenticated = !!identity && !identity.getPrincipal().isAnonymous();
 
   if (isLoading) {
     return (
       <div className="flex min-h-[600px] items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-accent" />
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
       </div>
     );
   }
@@ -35,18 +35,17 @@ export default function AdminPage() {
   if (!isAuthenticated) {
     return (
       <div className="container mx-auto px-4 py-20">
-        <div className="absolute inset-0 bg-texture pointer-events-none" />
-        <div className="relative mx-auto max-w-md">
-          <Alert className="glass-strong border-2 border-primary/60 shadow-glow-md">
-            <Lock className="h-6 w-6 text-primary" />
-            <AlertTitle className="text-xl">Authentication Required</AlertTitle>
-            <AlertDescription className="text-base">
+        <div className="mx-auto max-w-md">
+          <Alert>
+            <Lock className="h-5 w-5" />
+            <AlertTitle className="text-lg">Authentication Required</AlertTitle>
+            <AlertDescription>
               Please log in to access the admin panel.
             </AlertDescription>
           </Alert>
           <Button
             onClick={() => login()}
-            className="mt-6 w-full bg-gradient-to-r from-accent to-primary hover:shadow-glow-md font-semibold"
+            className="mt-6 w-full"
           >
             Log In
           </Button>
@@ -59,7 +58,6 @@ export default function AdminPage() {
   if (!isAdmin) {
     return (
       <div className="container mx-auto px-4 py-12">
-        <div className="absolute inset-0 bg-texture pointer-events-none" />
         <AdminAccessHelper />
       </div>
     );
@@ -67,62 +65,62 @@ export default function AdminPage() {
 
   // Admin user
   return (
-    <div className="relative container mx-auto px-4 py-12 min-h-screen">
-      <div className="absolute inset-0 bg-texture pointer-events-none" />
-      
-      <div className="relative mb-12 animate-fade-in">
-        <h1 className="mb-4 text-5xl font-bold tracking-tight md:text-6xl gradient-heading">
+    <div className="container mx-auto px-4 py-12 min-h-screen">
+      <div className="mb-12">
+        <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl">
           Admin Panel
         </h1>
-        <p className="text-muted-foreground text-xl">Manage your photography and videography business</p>
+        <p className="text-lg text-muted-foreground">
+          Manage your studio content and settings
+        </p>
       </div>
 
-      <Tabs defaultValue="photos" className="relative space-y-8">
-        <TabsList className="glass-strong border-accent/30 p-2 flex-wrap h-auto gap-2">
-          <TabsTrigger value="photos" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Photos</TabsTrigger>
-          <TabsTrigger value="videos" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Videos</TabsTrigger>
-          <TabsTrigger value="events" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Events</TabsTrigger>
-          <TabsTrigger value="special-moments" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Special Moments</TabsTrigger>
-          <TabsTrigger value="orders" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Orders</TabsTrigger>
-          <TabsTrigger value="shortlists" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Shortlists</TabsTrigger>
-          <TabsTrigger value="statistics" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Statistics</TabsTrigger>
-          <TabsTrigger value="visitors" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Visitors</TabsTrigger>
-          <TabsTrigger value="footer" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent/20 data-[state=active]:to-primary/20 data-[state=active]:text-accent font-semibold">Footer</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-9 gap-2">
+          <TabsTrigger value="orders">Orders</TabsTrigger>
+          <TabsTrigger value="photos">Photos</TabsTrigger>
+          <TabsTrigger value="videos">Videos</TabsTrigger>
+          <TabsTrigger value="events">Events</TabsTrigger>
+          <TabsTrigger value="moments">Moments</TabsTrigger>
+          <TabsTrigger value="shortlists">Shortlists</TabsTrigger>
+          <TabsTrigger value="visitors">Visitors</TabsTrigger>
+          <TabsTrigger value="stats">Stats</TabsTrigger>
+          <TabsTrigger value="footer">Footer</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="photos">
-          <PhotoUploadSection />
-        </TabsContent>
-
-        <TabsContent value="videos">
-          <VideoUploadSection />
-        </TabsContent>
-
-        <TabsContent value="events">
-          <EventManagementSection />
-        </TabsContent>
-
-        <TabsContent value="special-moments">
-          <SpecialMomentManagementSection />
-        </TabsContent>
-
-        <TabsContent value="orders">
+        <TabsContent value="orders" className="space-y-6">
           <OrdersSection />
         </TabsContent>
 
-        <TabsContent value="shortlists">
+        <TabsContent value="photos" className="space-y-6">
+          <PhotoUploadSection />
+        </TabsContent>
+
+        <TabsContent value="videos" className="space-y-6">
+          <VideoUploadSection />
+        </TabsContent>
+
+        <TabsContent value="events" className="space-y-6">
+          <EventManagementSection />
+        </TabsContent>
+
+        <TabsContent value="moments" className="space-y-6">
+          <SpecialMomentManagementSection />
+        </TabsContent>
+
+        <TabsContent value="shortlists" className="space-y-6">
           <ShortlistsSection />
         </TabsContent>
 
-        <TabsContent value="statistics">
-          <UserStatisticsSection />
-        </TabsContent>
-
-        <TabsContent value="visitors">
+        <TabsContent value="visitors" className="space-y-6">
           <VisitorsSection />
         </TabsContent>
 
-        <TabsContent value="footer">
+        <TabsContent value="stats" className="space-y-6">
+          <UserStatisticsSection />
+        </TabsContent>
+
+        <TabsContent value="footer" className="space-y-6">
           <FooterEditSection />
         </TabsContent>
       </Tabs>

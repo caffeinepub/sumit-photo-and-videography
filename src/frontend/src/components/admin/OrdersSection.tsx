@@ -1,35 +1,48 @@
 import { useState } from 'react';
-import { useGetOrdersByStatus, useCreateOrder, useUpdateOrder, useUpdateOrderStatus, useDeleteOrder } from '../../hooks/useQueries';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Plus, Pencil, Trash2, Calendar, CheckCircle2, XCircle, Clock } from 'lucide-react';
-import { toast } from 'sonner';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { dateToTime, timeToDate } from '../../lib/time-utils';
-import { OrderStatus } from '../../backend';
-import type { Order, CreateOrderRequest, UpdateOrderRequest, UpdateOrderStatusRequest } from '../../backend';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Plus, Pencil, Trash2, ShoppingCart, DollarSign, Package } from 'lucide-react';
+import { toast } from 'sonner';
+import { OrderStatus } from '../../types/orders';
+import type { Order, CreateOrderRequest, UpdateOrderRequest, UpdateOrderStatusRequest, OrderItem, PaymentFields } from '../../types/orders';
+import { useGetOrdersByStatus, useCreateOrder, useUpdateOrder, useUpdateOrderStatus, useDeleteOrder } from '../../hooks/useQueries';
+import { dateToTime, timeToDate, formatTime } from '../../lib/time-utils';
+import { parseBigIntSafe, clampNonNegative, calculateRemainingDue, formatCurrency, calculateOrderSubtotal } from '../../lib/order-utils';
+import OrderLineItemsEditor from './OrderLineItemsEditor';
 
 export default function OrdersSection() {
   const [statusFilter, setStatusFilter] = useState<OrderStatus | null>(null);
-  const { data: orders = [], isLoading } = useGetOrdersByStatus(statusFilter);
-  const createOrderMutation = useCreateOrder();
-  const updateOrderMutation = useUpdateOrder();
-  const updateOrderStatusMutation = useUpdateOrderStatus();
-  const deleteOrderMutation = useDeleteOrder();
-
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
 
+  const { data: orders = [], isLoading } = useGetOrdersByStatus(statusFilter);
+  const createOrder = useCreateOrder();
+  const updateOrder = useUpdateOrder();
+  const updateOrderStatus = useUpdateOrderStatus();
+  const deleteOrder = useDeleteOrder();
+
+  // Form state for create/edit
   const [formData, setFormData] = useState({
     orderDate: '',
     fulfillDate: '',
     customerName: '',
-    numberOfDvd: '',
-    numberOfPrints: '',
+    numberOfDvd: '0',
+    numberOfPrints: '0',
+    paymentTotal: '0',
+    paymentAdvance: '0',
+    items: [] as OrderItem[],
   });
 
   const resetForm = () => {
@@ -37,75 +50,17 @@ export default function OrdersSection() {
       orderDate: '',
       fulfillDate: '',
       customerName: '',
-      numberOfDvd: '',
-      numberOfPrints: '',
+      numberOfDvd: '0',
+      numberOfPrints: '0',
+      paymentTotal: '0',
+      paymentAdvance: '0',
+      items: [],
     });
   };
 
-  const handleCreateOrder = async () => {
-    if (!formData.orderDate || !formData.fulfillDate) {
-      toast.error('Please fill in both order date and fulfill date');
-      return;
-    }
-
-    try {
-      const request: CreateOrderRequest = {
-        orderDate: dateToTime(formData.orderDate),
-        fulfillDate: dateToTime(formData.fulfillDate),
-        customerName: formData.customerName || 'N/A',
-        numberOfDvd: BigInt(formData.numberOfDvd || '0'),
-        numberOfPrints: BigInt(formData.numberOfPrints || '0'),
-      };
-
-      await createOrderMutation.mutateAsync(request);
-      toast.success('Order created successfully');
-      setIsCreateDialogOpen(false);
-      resetForm();
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to create order');
-    }
-  };
-
-  const handleUpdateOrder = async () => {
-    if (!editingOrder) return;
-
-    try {
-      const request: UpdateOrderRequest = {
-        fulfillDate: formData.fulfillDate ? dateToTime(formData.fulfillDate) : undefined,
-        customerName: formData.customerName || undefined,
-        numberOfDvd: formData.numberOfDvd ? BigInt(formData.numberOfDvd) : undefined,
-        numberOfPrints: formData.numberOfPrints ? BigInt(formData.numberOfPrints) : undefined,
-      };
-
-      await updateOrderMutation.mutateAsync({ orderId: editingOrder.id, request });
-      toast.success('Order updated successfully');
-      setIsEditDialogOpen(false);
-      setEditingOrder(null);
-      resetForm();
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to update order');
-    }
-  };
-
-  const handleUpdateOrderStatus = async (orderId: bigint, status: OrderStatus) => {
-    try {
-      const request: UpdateOrderStatusRequest = { status };
-      await updateOrderStatusMutation.mutateAsync({ orderId, request });
-      toast.success(`Order marked as ${status}`);
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to update order status');
-    }
-  };
-
-  const handleDeleteOrder = async (orderId: bigint) => {
-    if (!confirm('Are you sure you want to delete this order?')) return;
-
-    try {
-      await deleteOrderMutation.mutateAsync(orderId);
-      toast.success('Order deleted successfully');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to delete order');
-    }
+  const openCreateDialog = () => {
+    resetForm();
+    setIsCreateDialogOpen(true);
   };
 
   const openEditDialog = (order: Order) => {
@@ -116,374 +71,519 @@ export default function OrdersSection() {
       customerName: order.customerName,
       numberOfDvd: order.numberOfDvd.toString(),
       numberOfPrints: order.numberOfPrints.toString(),
+      paymentTotal: order.payment.total.toString(),
+      paymentAdvance: order.payment.advance.toString(),
+      items: order.items,
     });
     setIsEditDialogOpen(true);
   };
 
-  const openCreateDialog = () => {
-    resetForm();
-    setIsCreateDialogOpen(true);
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.customerName.trim()) {
+      toast.error('Customer name is required');
+      return;
+    }
+
+    if (!formData.orderDate || !formData.fulfillDate) {
+      toast.error('Order date and fulfill date are required');
+      return;
+    }
+
+    const total = parseBigIntSafe(formData.paymentTotal);
+    const advance = parseBigIntSafe(formData.paymentAdvance);
+    const remainingDue = calculateRemainingDue(total, advance);
+
+    const payment: PaymentFields = {
+      total,
+      advance,
+      remainingDue,
+    };
+
+    const request: CreateOrderRequest = {
+      orderDate: dateToTime(formData.orderDate),
+      fulfillDate: dateToTime(formData.fulfillDate),
+      customerName: formData.customerName.trim(),
+      numberOfDvd: parseBigIntSafe(formData.numberOfDvd),
+      numberOfPrints: parseBigIntSafe(formData.numberOfPrints),
+      payment,
+      items: formData.items,
+    };
+
+    createOrder.mutate(request, {
+      onSuccess: () => {
+        toast.success('Order created successfully');
+        setIsCreateDialogOpen(false);
+        resetForm();
+      },
+      onError: (error) => {
+        console.error('Failed to create order:', error);
+        toast.error('Failed to create order');
+      },
+    });
   };
 
-  const getStatusBadge = (status: OrderStatus) => {
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!editingOrder) return;
+
+    const total = parseBigIntSafe(formData.paymentTotal);
+    const advance = parseBigIntSafe(formData.paymentAdvance);
+    const remainingDue = calculateRemainingDue(total, advance);
+
+    const payment: PaymentFields = {
+      total,
+      advance,
+      remainingDue,
+    };
+
+    const request: UpdateOrderRequest = {
+      fulfillDate: dateToTime(formData.fulfillDate),
+      customerName: formData.customerName.trim(),
+      numberOfDvd: parseBigIntSafe(formData.numberOfDvd),
+      numberOfPrints: parseBigIntSafe(formData.numberOfPrints),
+      payment,
+      items: formData.items,
+    };
+
+    updateOrder.mutate(
+      { orderId: editingOrder.id, request },
+      {
+        onSuccess: () => {
+          toast.success('Order updated successfully');
+          setIsEditDialogOpen(false);
+          setEditingOrder(null);
+          resetForm();
+        },
+        onError: (error) => {
+          console.error('Failed to update order:', error);
+          toast.error('Failed to update order');
+        },
+      }
+    );
+  };
+
+  const handleStatusChange = (orderId: bigint, newStatus: OrderStatus) => {
+    const request: UpdateOrderStatusRequest = { status: newStatus };
+    updateOrderStatus.mutate(
+      { orderId, request },
+      {
+        onSuccess: () => {
+          toast.success(`Order marked as ${newStatus}`);
+        },
+        onError: (error) => {
+          console.error('Failed to update order status:', error);
+          toast.error('Failed to update order status');
+        },
+      }
+    );
+  };
+
+  const handleDelete = (orderId: bigint) => {
+    if (!confirm('Are you sure you want to delete this order?')) return;
+
+    deleteOrder.mutate(orderId, {
+      onSuccess: () => {
+        toast.success('Order deleted successfully');
+      },
+      onError: (error) => {
+        console.error('Failed to delete order:', error);
+        toast.error('Failed to delete order');
+      },
+    });
+  };
+
+  const getStatusBadgeVariant = (status: OrderStatus): 'default' | 'secondary' | 'destructive' => {
     switch (status) {
-      case OrderStatus.Pending:
-        return (
-          <Badge className="badge-pending gap-1.5 px-3 py-1.5 text-sm font-semibold">
-            <Clock className="h-4 w-4" />
-            Pending
-          </Badge>
-        );
       case OrderStatus.Fulfilled:
-        return (
-          <Badge className="badge-fulfilled gap-1.5 px-3 py-1.5 text-sm font-semibold">
-            <CheckCircle2 className="h-4 w-4" />
-            Fulfilled
-          </Badge>
-        );
+        return 'default';
+      case OrderStatus.Pending:
+        return 'secondary';
       case OrderStatus.Cancelled:
-        return (
-          <Badge className="badge-cancelled gap-1.5 px-3 py-1.5 text-sm font-semibold">
-            <XCircle className="h-4 w-4" />
-            Cancelled
-          </Badge>
-        );
+        return 'destructive';
+      default:
+        return 'secondary';
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-10 w-10 animate-spin text-accent" />
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6 animate-fade-in">
-      <Card className="glass-strong border-accent/30 shadow-lg">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-3xl gradient-heading">Orders Management</CardTitle>
-              <CardDescription className="text-base mt-2">
-                Manage orders with status tracking and lifecycle management
-              </CardDescription>
-            </div>
-            <Button onClick={openCreateDialog} className="gap-2 bg-gradient-to-r from-accent to-primary hover:shadow-glow-md font-semibold">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Orders</h2>
+          <p className="text-muted-foreground">Manage customer orders with payment tracking</p>
+        </div>
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={openCreateDialog} className="gap-2">
               <Plus className="h-4 w-4" />
               Create Order
             </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {/* Status Filter */}
-          <div className="mb-6">
-            <Label className="text-sm font-semibold mb-3 block">Filter by Status</Label>
-            <div className="flex flex-wrap gap-3">
-              <Button
-                variant={statusFilter === null ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setStatusFilter(null)}
-                className={`gap-2 font-semibold ${statusFilter === null ? 'bg-gradient-to-r from-accent to-primary' : 'hover:border-accent/50'}`}
-              >
-                All Orders
-                <Badge variant="secondary" className="ml-1 bg-accent/20">
-                  {orders.length}
-                </Badge>
-              </Button>
-              <Button
-                variant={statusFilter === OrderStatus.Pending ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setStatusFilter(OrderStatus.Pending)}
-                className={`gap-2 font-semibold ${statusFilter === OrderStatus.Pending ? 'bg-gradient-to-r from-accent to-primary' : 'hover:border-accent/50'}`}
-              >
-                <Clock className="h-3.5 w-3.5" />
-                Pending
-                <Badge variant="secondary" className="ml-1 bg-amber-500/20">
-                  {orders.filter((o) => o.status === OrderStatus.Pending).length}
-                </Badge>
-              </Button>
-              <Button
-                variant={statusFilter === OrderStatus.Fulfilled ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setStatusFilter(OrderStatus.Fulfilled)}
-                className={`gap-2 font-semibold ${statusFilter === OrderStatus.Fulfilled ? 'bg-gradient-to-r from-accent to-primary' : 'hover:border-accent/50'}`}
-              >
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                Fulfilled
-                <Badge variant="secondary" className="ml-1 bg-emerald-500/20">
-                  {orders.filter((o) => o.status === OrderStatus.Fulfilled).length}
-                </Badge>
-              </Button>
-              <Button
-                variant={statusFilter === OrderStatus.Cancelled ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setStatusFilter(OrderStatus.Cancelled)}
-                className={`gap-2 font-semibold ${statusFilter === OrderStatus.Cancelled ? 'bg-gradient-to-r from-accent to-primary' : 'hover:border-accent/50'}`}
-              >
-                <XCircle className="h-3.5 w-3.5" />
-                Cancelled
-                <Badge variant="secondary" className="ml-1 bg-rose-500/20">
-                  {orders.filter((o) => o.status === OrderStatus.Cancelled).length}
-                </Badge>
-              </Button>
-            </div>
-          </div>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Create New Order</DialogTitle>
+              <DialogDescription>Add a new order with payment details and items</DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleCreate} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="orderDate">Order Date</Label>
+                  <Input
+                    id="orderDate"
+                    type="date"
+                    value={formData.orderDate}
+                    onChange={(e) => setFormData({ ...formData, orderDate: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="fulfillDate">Fulfill Date</Label>
+                  <Input
+                    id="fulfillDate"
+                    type="date"
+                    value={formData.fulfillDate}
+                    onChange={(e) => setFormData({ ...formData, fulfillDate: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
 
-          {orders.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p className="text-lg">
-                {statusFilter ? `No ${statusFilter.toLowerCase()} orders` : 'No orders yet'}
-              </p>
-              <p className="text-sm mt-2">
-                {statusFilter ? 'Try a different filter' : 'Create your first order to get started'}
-              </p>
+              <div className="space-y-2">
+                <Label htmlFor="customerName">Customer Name</Label>
+                <Input
+                  id="customerName"
+                  value={formData.customerName}
+                  onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
+                  placeholder="Enter customer name"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="numberOfDvd">Number of DVDs</Label>
+                  <Input
+                    id="numberOfDvd"
+                    type="number"
+                    min="0"
+                    value={formData.numberOfDvd}
+                    onChange={(e) => setFormData({ ...formData, numberOfDvd: clampNonNegative(e.target.value) })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="numberOfPrints">Number of Prints</Label>
+                  <Input
+                    id="numberOfPrints"
+                    type="number"
+                    min="0"
+                    value={formData.numberOfPrints}
+                    onChange={(e) => setFormData({ ...formData, numberOfPrints: clampNonNegative(e.target.value) })}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="paymentTotal">Total Amount</Label>
+                  <Input
+                    id="paymentTotal"
+                    type="number"
+                    min="0"
+                    value={formData.paymentTotal}
+                    onChange={(e) => setFormData({ ...formData, paymentTotal: clampNonNegative(e.target.value) })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="paymentAdvance">Advance Paid</Label>
+                  <Input
+                    id="paymentAdvance"
+                    type="number"
+                    min="0"
+                    value={formData.paymentAdvance}
+                    onChange={(e) => setFormData({ ...formData, paymentAdvance: clampNonNegative(e.target.value) })}
+                  />
+                </div>
+              </div>
+
+              <OrderLineItemsEditor
+                items={formData.items}
+                onChange={(items) => setFormData({ ...formData, items })}
+              />
+
+              <div className="flex justify-end gap-2 pt-4">
+                <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={createOrder.isPending}>
+                  {createOrder.isPending ? 'Creating...' : 'Create Order'}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {/* Filters */}
+      <div className="flex gap-2">
+        <Button
+          variant={statusFilter === null ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setStatusFilter(null)}
+        >
+          All
+        </Button>
+        <Button
+          variant={statusFilter === OrderStatus.Pending ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setStatusFilter(OrderStatus.Pending)}
+        >
+          Pending
+        </Button>
+        <Button
+          variant={statusFilter === OrderStatus.Fulfilled ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setStatusFilter(OrderStatus.Fulfilled)}
+        >
+          Fulfilled
+        </Button>
+        <Button
+          variant={statusFilter === OrderStatus.Cancelled ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setStatusFilter(OrderStatus.Cancelled)}
+        >
+          Cancelled
+        </Button>
+      </div>
+
+      {/* Orders List */}
+      {isLoading ? (
+        <Card>
+          <CardContent className="py-12">
+            <p className="text-center text-muted-foreground">Loading orders...</p>
+          </CardContent>
+        </Card>
+      ) : orders.length === 0 ? (
+        <Card>
+          <CardContent className="py-12">
+            <div className="flex flex-col items-center justify-center text-center">
+              <ShoppingCart className="h-16 w-16 text-muted-foreground mb-4" />
+              <p className="text-lg text-muted-foreground mb-2">No orders found</p>
+              <p className="text-sm text-muted-foreground">Create your first order to get started</p>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {orders.map((order) => (
-                <Card key={order.id.toString()} className="glass border-accent/20 hover:border-accent/40 transition-all">
-                  <CardContent className="pt-6">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-3 flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          {getStatusBadge(order.status)}
-                          <span className="text-xs text-muted-foreground font-medium">Order #{order.id.toString()}</span>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4">
+          {orders.map((order) => (
+            <Card key={order.id.toString()} className="border-2">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <ShoppingCart className="h-5 w-5" />
+                      Order #{order.id.toString()}
+                    </CardTitle>
+                    <CardDescription>
+                      Customer: {order.customerName} • Order Date: {formatTime(order.orderDate)} • Fulfill Date:{' '}
+                      {formatTime(order.fulfillDate)}
+                    </CardDescription>
+                  </div>
+                  <Badge variant={getStatusBadgeVariant(order.status)}>{order.status}</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Payment Details */}
+                <div className="grid grid-cols-3 gap-4 p-4 rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Total Amount</p>
+                      <p className="font-semibold">{formatCurrency(order.payment.total)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Advance Paid</p>
+                      <p className="font-semibold">{formatCurrency(order.payment.advance)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Remaining Due</p>
+                      <p className="font-semibold">{formatCurrency(order.payment.remainingDue)}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Items */}
+                {order.items.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                      <Package className="h-4 w-4" />
+                      Order Items
+                    </div>
+                    <div className="space-y-1">
+                      {order.items.map((item, idx) => (
+                        <div key={idx} className="flex justify-between text-sm p-2 rounded bg-muted/30">
+                          <span>
+                            {item.itemName} (x{item.quantity.toString()})
+                          </span>
+                          <span className="font-medium">{formatCurrency(item.quantity * item.unitPrice)}</span>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div>
-                            <p className="text-sm text-muted-foreground mb-1">Order Date</p>
-                            <p className="font-semibold text-lg">
-                              {new Date(Number(order.orderDate) / 1_000_000).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-muted-foreground mb-1">Fulfill Date</p>
-                            <p className="font-semibold text-lg">
-                              {new Date(Number(order.fulfillDate) / 1_000_000).toLocaleDateString()}
-                            </p>
-                          </div>
-                          {order.customerName && order.customerName !== 'N/A' && (
-                            <div>
-                              <p className="text-sm text-muted-foreground mb-1">Customer Name</p>
-                              <p className="font-medium">{order.customerName}</p>
-                            </div>
-                          )}
-                          {(order.numberOfDvd > 0 || order.numberOfPrints > 0) && (
-                            <div>
-                              <p className="text-sm text-muted-foreground mb-1">Items</p>
-                              <p className="font-medium">
-                                {order.numberOfDvd > 0 && `${order.numberOfDvd.toString()} DVD${order.numberOfDvd > 1 ? 's' : ''}`}
-                                {order.numberOfDvd > 0 && order.numberOfPrints > 0 && ', '}
-                                {order.numberOfPrints > 0 && `${order.numberOfPrints.toString()} Print${order.numberOfPrints > 1 ? 's' : ''}`}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                        {/* Quick Status Actions */}
-                        {order.status === OrderStatus.Pending && (
-                          <div className="flex gap-2 pt-2">
-                            <Button
-                              size="sm"
-                              onClick={() => handleUpdateOrderStatus(order.id, OrderStatus.Fulfilled)}
-                              disabled={updateOrderStatusMutation.isPending}
-                              className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
-                            >
-                              <CheckCircle2 className="h-3.5 w-3.5" />
-                              Mark Fulfilled
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleUpdateOrderStatus(order.id, OrderStatus.Cancelled)}
-                              disabled={updateOrderStatusMutation.isPending}
-                              className="gap-1.5 border-rose-500/50 text-rose-600 hover:bg-rose-500/10 font-semibold"
-                            >
-                              <XCircle className="h-3.5 w-3.5" />
-                              Cancel
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex gap-2 ml-4">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => openEditDialog(order)}
-                          className="hover:bg-accent/10 hover:border-accent/50"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDeleteOrder(order.id)}
-                          disabled={deleteOrderMutation.isPending}
-                          className="hover:bg-destructive/10 hover:border-destructive/50 hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                      ))}
+                      <div className="flex justify-between text-sm font-semibold p-2 rounded bg-muted/50">
+                        <span>Subtotal</span>
+                        <span>{formatCurrency(calculateOrderSubtotal(order.items))}</span>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                  </div>
+                )}
 
-      {/* Create Order Dialog */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="glass-strong border-accent/30">
+                {/* Actions */}
+                <div className="flex gap-2 pt-2">
+                  {order.status === OrderStatus.Pending && (
+                    <>
+                      <Button size="sm" variant="outline" onClick={() => handleStatusChange(order.id, OrderStatus.Fulfilled)}>
+                        Mark Fulfilled
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleStatusChange(order.id, OrderStatus.Cancelled)}
+                      >
+                        Cancel Order
+                      </Button>
+                    </>
+                  )}
+                  <Button size="sm" variant="outline" onClick={() => openEditDialog(order)} className="gap-2">
+                    <Pencil className="h-3 w-3" />
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleDelete(order.id)}
+                    className="gap-2 text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                    Delete
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Edit Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl gradient-heading">Create New Order</DialogTitle>
-            <DialogDescription className="text-base">
-              Fill in the order details below
-            </DialogDescription>
+            <DialogTitle>Edit Order</DialogTitle>
+            <DialogDescription>Update order details and payment information</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="orderDate" className="font-semibold">Order Date *</Label>
-              <Input
-                id="orderDate"
-                type="date"
-                value={formData.orderDate}
-                onChange={(e) => setFormData({ ...formData, orderDate: e.target.value })}
-                className="control-surface"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="fulfillDate" className="font-semibold">Fulfill Date *</Label>
-              <Input
-                id="fulfillDate"
-                type="date"
-                value={formData.fulfillDate}
-                onChange={(e) => setFormData({ ...formData, fulfillDate: e.target.value })}
-                className="control-surface"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="customerName" className="font-semibold">Customer Name</Label>
-              <Input
-                id="customerName"
-                value={formData.customerName}
-                onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-                placeholder="Enter customer name"
-                className="control-surface"
-              />
-            </div>
+          <form onSubmit={handleUpdate} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="numberOfDvd" className="font-semibold">Number of DVDs</Label>
-                <Input
-                  id="numberOfDvd"
-                  type="number"
-                  min="0"
-                  value={formData.numberOfDvd}
-                  onChange={(e) => setFormData({ ...formData, numberOfDvd: e.target.value })}
-                  placeholder="0"
-                  className="control-surface"
-                />
+                <Label htmlFor="edit-orderDate">Order Date</Label>
+                <Input id="edit-orderDate" type="date" value={formData.orderDate} disabled />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="numberOfPrints" className="font-semibold">Number of Prints</Label>
+                <Label htmlFor="edit-fulfillDate">Fulfill Date</Label>
                 <Input
-                  id="numberOfPrints"
-                  type="number"
-                  min="0"
-                  value={formData.numberOfPrints}
-                  onChange={(e) => setFormData({ ...formData, numberOfPrints: e.target.value })}
-                  placeholder="0"
-                  className="control-surface"
+                  id="edit-fulfillDate"
+                  type="date"
+                  value={formData.fulfillDate}
+                  onChange={(e) => setFormData({ ...formData, fulfillDate: e.target.value })}
+                  required
                 />
               </div>
             </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="hover:border-accent/50">
-              Cancel
-            </Button>
-            <Button
-              onClick={handleCreateOrder}
-              disabled={createOrderMutation.isPending}
-              className="bg-gradient-to-r from-accent to-primary hover:shadow-glow-md font-semibold"
-            >
-              {createOrderMutation.isPending ? 'Creating...' : 'Create Order'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
-      {/* Edit Order Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="glass-strong border-accent/30">
-          <DialogHeader>
-            <DialogTitle className="text-2xl gradient-heading">Edit Order</DialogTitle>
-            <DialogDescription className="text-base">
-              Update the order details below
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-fulfillDate" className="font-semibold">Fulfill Date</Label>
-              <Input
-                id="edit-fulfillDate"
-                type="date"
-                value={formData.fulfillDate}
-                onChange={(e) => setFormData({ ...formData, fulfillDate: e.target.value })}
-                className="control-surface"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-customerName" className="font-semibold">Customer Name</Label>
+              <Label htmlFor="edit-customerName">Customer Name</Label>
               <Input
                 id="edit-customerName"
                 value={formData.customerName}
                 onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
                 placeholder="Enter customer name"
-                className="control-surface"
+                required
               />
             </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="edit-numberOfDvd" className="font-semibold">Number of DVDs</Label>
+                <Label htmlFor="edit-numberOfDvd">Number of DVDs</Label>
                 <Input
                   id="edit-numberOfDvd"
                   type="number"
                   min="0"
                   value={formData.numberOfDvd}
-                  onChange={(e) => setFormData({ ...formData, numberOfDvd: e.target.value })}
-                  className="control-surface"
+                  onChange={(e) => setFormData({ ...formData, numberOfDvd: clampNonNegative(e.target.value) })}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-numberOfPrints" className="font-semibold">Number of Prints</Label>
+                <Label htmlFor="edit-numberOfPrints">Number of Prints</Label>
                 <Input
                   id="edit-numberOfPrints"
                   type="number"
                   min="0"
                   value={formData.numberOfPrints}
-                  onChange={(e) => setFormData({ ...formData, numberOfPrints: e.target.value })}
-                  className="control-surface"
+                  onChange={(e) => setFormData({ ...formData, numberOfPrints: clampNonNegative(e.target.value) })}
                 />
               </div>
             </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="hover:border-accent/50">
-              Cancel
-            </Button>
-            <Button
-              onClick={handleUpdateOrder}
-              disabled={updateOrderMutation.isPending}
-              className="bg-gradient-to-r from-accent to-primary hover:shadow-glow-md font-semibold"
-            >
-              {updateOrderMutation.isPending ? 'Updating...' : 'Update Order'}
-            </Button>
-          </DialogFooter>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-paymentTotal">Total Amount</Label>
+                <Input
+                  id="edit-paymentTotal"
+                  type="number"
+                  min="0"
+                  value={formData.paymentTotal}
+                  onChange={(e) => setFormData({ ...formData, paymentTotal: clampNonNegative(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-paymentAdvance">Advance Paid</Label>
+                <Input
+                  id="edit-paymentAdvance"
+                  type="number"
+                  min="0"
+                  value={formData.paymentAdvance}
+                  onChange={(e) => setFormData({ ...formData, paymentAdvance: clampNonNegative(e.target.value) })}
+                />
+              </div>
+            </div>
+
+            <OrderLineItemsEditor
+              items={formData.items}
+              onChange={(items) => setFormData({ ...formData, items })}
+            />
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsEditDialogOpen(false);
+                  setEditingOrder(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={updateOrder.isPending}>
+                {updateOrder.isPending ? 'Updating...' : 'Update Order'}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

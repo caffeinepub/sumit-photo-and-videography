@@ -2,11 +2,23 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-global-tailwind-css-theme-tokens-to-use-a-more-colorful-modern-palette-without-relying-on-blue-purple-as-the-main-identity-colors-and-ensure-the-palette-works-consistently-in-both-light-and-dark-mode-across-all-pages",
-      "featureTitle": "Update the global Tailwind/CSS theme tokens to use a more colorful, modern palette (without relying on blue/purple as the main identity colors) and ensure the palette works consistently in both light and dark mode across all pages.",
+      "featureId": "feature-restore-the-application-s-previously-available-top-level-sections-so-the-ui-is-not-limited-to-the-orders-admin-section-at-minimum-re-add-working-routes-and-pages-for-photos-videos-events-and-any-related-sections-that-previously-existed-in-the-app-e-g-special-moments-favorites-portfolio-business-info-media-groups-so-users-can-navigate-to-them-again",
+      "featureTitle": "Restore the application’s previously available top-level sections so the UI is not limited to the Orders admin section. At minimum, re-add working routes and pages for Photos, Videos, Events, and any related sections that previously existed in the app (e.g., Special Moments, Favorites, Portfolio, Business Info, Media Groups) so users can navigate to them again.",
       "files": [
-        "frontend/src/index.css",
-        "frontend/tailwind.config.js"
+        "frontend/src/App.tsx",
+        "frontend/src/components/Header.tsx",
+        "frontend/src/pages/BusinessInfoPage.tsx",
+        "frontend/src/pages/EventDetailPage.tsx",
+        "frontend/src/pages/EventPage.tsx",
+        "frontend/src/pages/EventsPage.tsx",
+        "frontend/src/pages/FavoritesPage.tsx",
+        "frontend/src/pages/MediaGroupPage.tsx",
+        "frontend/src/pages/PhotoDetailPage.tsx",
+        "frontend/src/pages/PhotosPage.tsx",
+        "frontend/src/pages/PortfolioPage.tsx",
+        "frontend/src/pages/SpecialMomentPage.tsx",
+        "frontend/src/pages/SpecialMomentsPage.tsx",
+        "frontend/src/pages/VideosPage.tsx"
       ],
       "components": [
         "authorization@3.0.0",
@@ -25,17 +37,14 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-apply-the-refreshed-colorful-styling-consistently-across-all-major-site-sections-header-footer-home-photos-videos-events-special-moments-business-info-and-admin-by-improving-section-headers-cards-and-call-to-action-areas-using-gradients-accent-borders-and-hover-focus-states",
-      "featureTitle": "Apply the refreshed colorful styling consistently across all major site sections (Header, Footer, Home, Photos, Videos, Events, Special Moments, Business Info, and Admin) by improving section headers, cards, and call-to-action areas using gradients, accent borders, and hover/focus states.",
+      "featureId": "feature-restore-the-content-and-ui-structure-for-the-restored-sections-photos-videos-events-etc-so-they-resemble-the-previous-multi-section-experience-rather-than-an-order-only-landing-page-ensure-user-facing-labels-and-messages-are-in-english",
+      "featureTitle": "Restore the content and UI structure for the restored sections (Photos, Videos, Events, etc.) so they resemble the previous multi-section experience rather than an order-only landing page. Ensure user-facing labels and messages are in English.",
       "files": [
         "frontend/src/components/Footer.tsx",
-        "frontend/src/components/Header.tsx",
-        "frontend/src/index.css",
-        "frontend/src/pages/AdminPage.tsx",
-        "frontend/src/pages/EventsPage.tsx",
-        "frontend/src/pages/HomePage.tsx",
-        "frontend/src/pages/PhotosPage.tsx",
-        "frontend/src/pages/SpecialMomentsPage.tsx"
+        "frontend/src/components/PhotoActions.tsx",
+        "frontend/src/components/PhotosViewer.tsx",
+        "frontend/src/lib/blob-utils.ts",
+        "frontend/src/pages/HomePage.tsx"
       ],
       "components": [
         "authorization@3.0.0",
@@ -54,36 +63,18 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-make-all-key-options-and-controls-select-dropdown-triggers-menus-badges-filters-tabs-if-present-and-admin-form-controls-more-visually-appealing-by-enhancing-color-spacing-and-state-styling-hover-selected-disabled-error-while-keeping-usability-and-readability-high",
-      "featureTitle": "Make all key “options” and controls (Select dropdown triggers/menus, badges, filters, tabs if present, and admin form controls) more visually appealing by enhancing color, spacing, and state styling (hover/selected/disabled/error) while keeping usability and readability high.",
+      "featureId": "feature-restore-admin-panel-navigation-and-sections-beyond-orders-e-g-photo-upload-management-video-upload-management-event-management-special-moment-management-shortlists-visitors-footer-editing-user-statistics-so-admins-can-manage-all-previously-available-content-areas-from-the-admin-ui",
+      "featureTitle": "Restore admin panel navigation and sections beyond Orders (e.g., Photo upload/management, Video upload/management, Event management, Special moment management, Shortlists, Visitors, Footer editing, User statistics) so admins can manage all previously available content areas from the admin UI.",
       "files": [
-        "frontend/src/components/admin/OrdersSection.tsx",
-        "frontend/src/index.css",
-        "frontend/src/pages/EventsPage.tsx",
-        "frontend/src/pages/PhotosPage.tsx",
-        "frontend/src/pages/SpecialMomentsPage.tsx"
-      ],
-      "components": [
-        "authorization@3.0.0",
-        "blob-storage@4.0.0",
-        "qr-code@1.0.0",
-        "camera@1.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-establish-and-enforce-one-coherent-visual-theme-direction-for-the-whole-ui-colors-typography-emphasis-spacing-rhythm-gradients-and-shadows-so-the-site-feels-intentionally-designed-and-consistently-good-looking-across-sections",
-      "featureTitle": "Establish and enforce one coherent visual theme direction for the whole UI (colors, typography emphasis, spacing rhythm, gradients, and shadows) so the site feels intentionally designed and consistently “good looking” across sections.",
-      "files": [
-        "frontend/src/index.css"
+        "frontend/src/components/admin/EventManagementSection.tsx",
+        "frontend/src/components/admin/FooterEditSection.tsx",
+        "frontend/src/components/admin/PhotoUploadSection.tsx",
+        "frontend/src/components/admin/ShortlistsSection.tsx",
+        "frontend/src/components/admin/SpecialMomentManagementSection.tsx",
+        "frontend/src/components/admin/UserStatisticsSection.tsx",
+        "frontend/src/components/admin/VideoUploadSection.tsx",
+        "frontend/src/components/admin/VisitorsSection.tsx",
+        "frontend/src/pages/AdminPage.tsx"
       ],
       "components": [
         "authorization@3.0.0",

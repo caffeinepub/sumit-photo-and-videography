@@ -10,140 +10,15 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export interface CreateOrderRequest {
-  'customerName' : string,
-  'orderDate' : Time,
-  'fulfillDate' : Time,
-  'numberOfDvd' : bigint,
-  'numberOfPrints' : bigint,
-}
-export interface EventCreateRequest {
-  'date' : Time,
+export interface UserProfile {
   'name' : string,
-  'description' : string,
+  'email' : string,
+  'address' : string,
+  'phone' : string,
 }
-export interface EventDTO {
-  'id' : bigint,
-  'date' : Time,
-  'name' : string,
-  'description' : string,
-  'passwordProtected' : boolean,
-  'images' : Array<EventImage>,
-}
-export interface EventFilter {
-  'endDate' : [] | [Time],
-  'searchText' : [] | [string],
-  'startDate' : [] | [Time],
-}
-export interface EventImage {
-  'id' : string,
-  'blob' : ExternalBlob,
-  'name' : string,
-  'description' : string,
-  'uploadTime' : Time,
-}
-export interface EventImageUploadRequest {
-  'eventId' : bigint,
-  'blob' : ExternalBlob,
-  'name' : string,
-  'description' : string,
-}
-export type ExternalBlob = Uint8Array;
-export interface FooterContent {
-  'instagram' : string,
-  'facebook' : string,
-  'youtube' : string,
-  'contactDetails' : string,
-}
-export interface MultiPhotoUploadRequest {
-  'photos' : Array<PhotoVideoUploadRequest>,
-}
-export interface Order {
-  'id' : bigint,
-  'customerName' : string,
-  'status' : OrderStatus,
-  'orderDate' : Time,
-  'fulfillDate' : Time,
-  'numberOfDvd' : bigint,
-  'numberOfPrints' : bigint,
-}
-export type OrderStatus = { 'Cancelled' : null } |
-  { 'Fulfilled' : null } |
-  { 'Pending' : null };
-export interface Photo {
-  'id' : string,
-  'likeCount' : bigint,
-  'blob' : ExternalBlob,
-  'name' : string,
-  'description' : string,
-  'uploadTime' : Time,
-}
-export interface PhotoFilter {
-  'endDate' : [] | [Time],
-  'searchText' : [] | [string],
-  'startDate' : [] | [Time],
-}
-export interface PhotoVideoUploadRequest {
-  'blob' : ExternalBlob,
-  'name' : string,
-  'description' : string,
-}
-export type SortedOrder = { 'newestFirst' : null } |
-  { 'oldestFirst' : null };
-export interface SpecialMomentCreateRequest { 'date' : Time, 'name' : string }
-export interface SpecialMomentDTO {
-  'id' : bigint,
-  'date' : Time,
-  'name' : string,
-  'images' : Array<SpecialMomentImage>,
-}
-export interface SpecialMomentFilter {
-  'endDate' : [] | [Time],
-  'searchText' : [] | [string],
-  'startDate' : [] | [Time],
-}
-export interface SpecialMomentImage {
-  'id' : string,
-  'blob' : ExternalBlob,
-  'name' : string,
-  'uploadTime' : Time,
-}
-export interface SpecialMomentImageUploadRequest {
-  'specialMomentId' : bigint,
-  'blob' : ExternalBlob,
-  'name' : string,
-}
-export type Time = bigint;
-export interface UpdateOrderRequest {
-  'customerName' : [] | [string],
-  'fulfillDate' : [] | [Time],
-  'numberOfDvd' : [] | [bigint],
-  'numberOfPrints' : [] | [bigint],
-}
-export interface UpdateOrderStatusRequest { 'status' : OrderStatus }
-export interface UploadResult { 'message' : string, 'success' : boolean }
-export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
-export interface UserShortlistDTO {
-  'eventId' : bigint,
-  'user' : Principal,
-  'images' : Array<string>,
-}
-export interface Video {
-  'id' : string,
-  'blob' : ExternalBlob,
-  'name' : string,
-  'description' : string,
-  'uploadTime' : Time,
-}
-export interface VideoFilter {
-  'endDate' : [] | [Time],
-  'searchText' : [] | [string],
-  'startDate' : [] | [Time],
-}
-export interface Visitor { 'principal' : Principal, 'timestamp' : Time }
 export interface _CaffeineStorageCreateCertificateResult {
   'method' : string,
   'blob_hash' : string,
@@ -172,98 +47,12 @@ export interface _SERVICE {
   >,
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'createEvent' : ActorMethod<[EventCreateRequest], bigint>,
-  'createNewAuthenticatedUser' : ActorMethod<[], boolean>,
-  'createOrder' : ActorMethod<[CreateOrderRequest], bigint>,
-  'createSpecialMoment' : ActorMethod<[SpecialMomentCreateRequest], bigint>,
-  'deleteEvent' : ActorMethod<[bigint], undefined>,
-  'deleteEventImage' : ActorMethod<[bigint, string], undefined>,
-  'deleteOrder' : ActorMethod<[bigint], undefined>,
-  'deletePhoto' : ActorMethod<[string], undefined>,
-  'deleteSpecialMoment' : ActorMethod<[bigint], undefined>,
-  'deleteSpecialMomentImage' : ActorMethod<[bigint, string], undefined>,
-  'deleteVideo' : ActorMethod<[string], undefined>,
-  'getAllEventsSorted' : ActorMethod<[SortedOrder], Array<EventDTO>>,
-  'getAllOrders' : ActorMethod<[], Array<Order>>,
-  'getAllOrdersSortedByDate' : ActorMethod<[], Array<Order>>,
-  'getAllPhotosSorted' : ActorMethod<[SortedOrder], Array<Photo>>,
-  'getAllShortlistedImagesForUser' : ActorMethod<
-    [Principal, bigint],
-    Array<string>
-  >,
-  'getAllShortlistsForAdmin' : ActorMethod<[], Array<UserShortlistDTO>>,
-  'getAllSpecialMomentsSorted' : ActorMethod<
-    [SortedOrder],
-    Array<SpecialMomentDTO>
-  >,
-  'getAllVideosSorted' : ActorMethod<[SortedOrder], Array<Video>>,
-  'getAppVersion' : ActorMethod<[], string>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
-  'getEvent' : ActorMethod<[bigint], EventDTO>,
-  'getEventImages' : ActorMethod<[bigint, SortedOrder], Array<EventImage>>,
-  'getFilteredEvents' : ActorMethod<
-    [SortedOrder, EventFilter],
-    Array<EventDTO>
-  >,
-  'getFilteredPhotos' : ActorMethod<[SortedOrder, PhotoFilter], Array<Photo>>,
-  'getFilteredSpecialMoments' : ActorMethod<
-    [SortedOrder, SpecialMomentFilter],
-    Array<SpecialMomentDTO>
-  >,
-  'getFilteredVideos' : ActorMethod<[SortedOrder, VideoFilter], Array<Video>>,
-  'getFooterContent' : ActorMethod<[], FooterContent>,
-  'getLikedPhotos' : ActorMethod<[Principal], Array<string>>,
-  'getOrder' : ActorMethod<[bigint], [] | [Order]>,
-  'getOrdersByStatus' : ActorMethod<[OrderStatus], Array<Order>>,
-  'getPasswordProtectedEvents' : ActorMethod<[], Array<bigint>>,
-  'getPhotoLikeCount' : ActorMethod<[string], bigint>,
-  'getShortlistCountForImage' : ActorMethod<[bigint, string], bigint>,
-  'getShortlistedImagesForUser' : ActorMethod<[bigint], Array<string>>,
-  'getSpecialMoment' : ActorMethod<[bigint], SpecialMomentDTO>,
-  'getSpecialMomentsImages' : ActorMethod<
-    [bigint, SortedOrder],
-    Array<SpecialMomentImage>
-  >,
-  'getTotalLikeCountForUser' : ActorMethod<[Principal], bigint>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
-  'getUserShortlistAcrossEvents' : ActorMethod<[], Array<UserShortlistDTO>>,
-  'getVisitors' : ActorMethod<
-    [{ 'limit' : bigint, 'start' : bigint }],
-    Array<Visitor>
-  >,
-  'hasUserLikedPhoto' : ActorMethod<[string], boolean>,
-  'hasUserLikedPhotoExplicit' : ActorMethod<[Principal, string], boolean>,
-  'hasUserShortlistedImage' : ActorMethod<[Principal, bigint, string], boolean>,
-  'hasUserShortlistedImageForCaller' : ActorMethod<[bigint, string], boolean>,
   'initializeAccessControl' : ActorMethod<[], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
-  'isEventPasswordProtected' : ActorMethod<[bigint], boolean>,
-  'recordVisitor' : ActorMethod<[], undefined>,
-  'removeEventPassword' : ActorMethod<[bigint], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
-  'setEventPassword' : ActorMethod<[bigint, string], undefined>,
-  'togglePhotoLike' : ActorMethod<[string], boolean>,
-  'toggleShortlist' : ActorMethod<[bigint, string], boolean>,
-  'updateEvent' : ActorMethod<[bigint, EventCreateRequest], undefined>,
-  'updateFooterContent' : ActorMethod<[FooterContent], undefined>,
-  'updateOrder' : ActorMethod<[bigint, UpdateOrderRequest], undefined>,
-  'updateOrderStatus' : ActorMethod<
-    [bigint, UpdateOrderStatusRequest],
-    undefined
-  >,
-  'uploadEventImage' : ActorMethod<[EventImageUploadRequest], UploadResult>,
-  'uploadMultiplePhotos' : ActorMethod<
-    [MultiPhotoUploadRequest],
-    Array<UploadResult>
-  >,
-  'uploadPhoto' : ActorMethod<[PhotoVideoUploadRequest], UploadResult>,
-  'uploadSpecialMomentImage' : ActorMethod<
-    [SpecialMomentImageUploadRequest],
-    UploadResult
-  >,
-  'uploadVideo' : ActorMethod<[PhotoVideoUploadRequest], UploadResult>,
-  'validateEventPassword' : ActorMethod<[bigint, string], boolean>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];
