@@ -12,8 +12,8 @@ export default function HomePage() {
       <section className="relative overflow-hidden bg-gradient-to-b from-background to-muted py-20 md:py-32">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="mb-6 text-4xl font-bold tracking-tight md:text-6xl">
-              Welcome to Studio Portal
+            <h1 className="mb-6 text-4xl font-extrabold tracking-tight md:text-6xl">
+              Sumit Photo and Videography
             </h1>
             <p className="mb-8 text-lg text-muted-foreground md:text-xl">
               Your complete photography and videography management platform
@@ -56,8 +56,8 @@ export default function HomePage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card className="cursor-pointer transition-all hover:shadow-lg" onClick={() => navigate({ to: '/photos' })}>
               <CardHeader>
-                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <Camera className="h-6 w-6 text-primary" />
+                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500">
+                  <Camera className="h-6 w-6 text-white" />
                 </div>
                 <CardTitle>Photos</CardTitle>
                 <CardDescription>
@@ -68,8 +68,8 @@ export default function HomePage() {
 
             <Card className="cursor-pointer transition-all hover:shadow-lg" onClick={() => navigate({ to: '/videos' })}>
               <CardHeader>
-                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <Video className="h-6 w-6 text-primary" />
+                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-pink-500">
+                  <Video className="h-6 w-6 text-white" />
                 </div>
                 <CardTitle>Videos</CardTitle>
                 <CardDescription>
@@ -80,8 +80,8 @@ export default function HomePage() {
 
             <Card className="cursor-pointer transition-all hover:shadow-lg" onClick={() => navigate({ to: '/events' })}>
               <CardHeader>
-                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <Calendar className="h-6 w-6 text-primary" />
+                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-red-500">
+                  <Calendar className="h-6 w-6 text-white" />
                 </div>
                 <CardTitle>Events</CardTitle>
                 <CardDescription>
@@ -92,8 +92,8 @@ export default function HomePage() {
 
             <Card className="cursor-pointer transition-all hover:shadow-lg" onClick={() => navigate({ to: '/favorites' })}>
               <CardHeader>
-                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <Heart className="h-6 w-6 text-primary" />
+                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-rose-500 to-pink-600">
+                  <Heart className="h-6 w-6 text-white" />
                 </div>
                 <CardTitle>Favorites</CardTitle>
                 <CardDescription>
@@ -104,8 +104,8 @@ export default function HomePage() {
 
             <Card className="cursor-pointer transition-all hover:shadow-lg" onClick={() => navigate({ to: '/portfolio' })}>
               <CardHeader>
-                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <Briefcase className="h-6 w-6 text-primary" />
+                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500">
+                  <Briefcase className="h-6 w-6 text-white" />
                 </div>
                 <CardTitle>Portfolio</CardTitle>
                 <CardDescription>
@@ -116,8 +116,8 @@ export default function HomePage() {
 
             <Card className="cursor-pointer transition-all hover:shadow-lg" onClick={() => navigate({ to: '/business-info' })}>
               <CardHeader>
-                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <Info className="h-6 w-6 text-primary" />
+                <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-blue-600">
+                  <Info className="h-6 w-6 text-white" />
                 </div>
                 <CardTitle>Business Info</CardTitle>
                 <CardDescription>

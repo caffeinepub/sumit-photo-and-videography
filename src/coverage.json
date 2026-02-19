@@ -1,103 +1,122 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T07:08:40.198Z",
+  "generatedAt": "2026-02-19T10:03:48.237Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 3,
+    "total": 10,
+    "implemented": 6,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Restore the application’s previously available top-level sections so the UI is not limited to the Orders admin section. At minimum, re-add working routes and pages for Photos, Videos, Events, and any related sections that previously existed in the app (e.g., Special Moments, Favorites, Portfolio, Business Info, Media Groups) so users can navigate to them again.",
+        "summary": "Implement backend photo upload handler that accepts ExternalBlob data with name, description, and category, stores the blob in stable memory, and returns the created photo record with generated ID and timestamp",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-10",
+        "summary": "Update VideosPage to fetch videos from backend using existing useVideos query hook, render video list with name and description, display video blobs as playable HTML5 video elements using blob-utils to convert ExternalBlob to URL, and show empty state when no videos exist",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/pages/PhotosPage.tsx",
           "frontend/src/pages/VideosPage.tsx",
-          "frontend/src/pages/EventsPage.tsx",
-          "frontend/src/pages/FavoritesPage.tsx",
-          "frontend/src/pages/PortfolioPage.tsx",
-          "frontend/src/pages/BusinessInfoPage.tsx",
-          "frontend/src/pages/SpecialMomentsPage.tsx",
-          "frontend/src/pages/SpecialMomentPage.tsx",
-          "frontend/src/pages/MediaGroupPage.tsx",
-          "frontend/src/pages/EventDetailPage.tsx",
-          "frontend/src/pages/EventPage.tsx",
-          "frontend/src/pages/PhotoDetailPage.tsx"
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/pages/PhotosPage.tsx",
           "frontend/src/pages/VideosPage.tsx",
-          "frontend/src/pages/EventsPage.tsx",
-          "frontend/src/pages/FavoritesPage.tsx",
-          "frontend/src/pages/PortfolioPage.tsx",
-          "frontend/src/pages/BusinessInfoPage.tsx",
-          "frontend/src/pages/SpecialMomentsPage.tsx",
-          "frontend/src/pages/SpecialMomentPage.tsx",
-          "frontend/src/pages/MediaGroupPage.tsx",
-          "frontend/src/pages/EventDetailPage.tsx",
-          "frontend/src/pages/EventPage.tsx",
-          "frontend/src/pages/PhotoDetailPage.tsx"
+          "frontend/src/hooks/useQueries.ts"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Restore the content and UI structure for the restored sections (Photos, Videos, Events, etc.) so they resemble the previous multi-section experience rather than an order-only landing page. Ensure user-facing labels and messages are in English.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/HomePage.tsx",
-          "frontend/src/components/Footer.tsx",
-          "frontend/src/components/PhotosViewer.tsx",
-          "frontend/src/components/PhotoActions.tsx",
-          "frontend/src/lib/blob-utils.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/HomePage.tsx",
-          "frontend/src/components/Footer.tsx",
-          "frontend/src/components/PhotosViewer.tsx",
-          "frontend/src/components/PhotoActions.tsx",
-          "frontend/src/lib/blob-utils.ts"
-        ]
+        "summary": "Implement backend video upload handler that accepts ExternalBlob data with name and description, stores the blob in stable memory, and returns the created video record with generated ID and timestamp",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
         "id": "REQ-3",
-        "summary": "Restore backend support for the non-order sections (Photos, Videos, Events, Special Moments, Favorites/likes, shortlists, visitors, footer content as applicable) so the restored frontend sections can load and mutate data without runtime failures.",
+        "summary": "Implement backend event creation handler that accepts event name, description, date, optional password, and optional image blob, stores the event with generated ID, and returns the complete event record",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
       },
       {
         "id": "REQ-4",
-        "summary": "Restore admin panel navigation and sections beyond Orders (e.g., Photo upload/management, Video upload/management, Event management, Special moment management, Shortlists, Visitors, Footer editing, User statistics) so admins can manage all previously available content areas from the admin UI.",
+        "summary": "Implement backend order creation handler that accepts customer name, phone, line items with quantities, delivery address, payment amount and method, stores the order with generated ID, and returns the complete order record with pending status",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-5",
+        "summary": "Connect PhotoUploadSection component to backend upload handler, enable multiple file selection in the file input, process each selected file through upload-utils to create ExternalBlob, call backend upload mutation for each photo, show upload progress, and refresh photo gallery on success",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/AdminPage.tsx",
           "frontend/src/components/admin/PhotoUploadSection.tsx",
-          "frontend/src/components/admin/VideoUploadSection.tsx",
-          "frontend/src/components/admin/EventManagementSection.tsx",
-          "frontend/src/components/admin/SpecialMomentManagementSection.tsx",
-          "frontend/src/components/admin/ShortlistsSection.tsx",
-          "frontend/src/components/admin/VisitorsSection.tsx",
-          "frontend/src/components/admin/FooterEditSection.tsx",
-          "frontend/src/components/admin/UserStatisticsSection.tsx"
+          "frontend/src/hooks/useQueries.ts"
         ],
         "matchedFiles": [
-          "frontend/src/pages/AdminPage.tsx",
           "frontend/src/components/admin/PhotoUploadSection.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-6",
+        "summary": "Connect VideoUploadSection component to backend upload handler, enable multiple file selection in the file input, process each selected file through upload-utils to create ExternalBlob, call backend upload mutation for each video, show upload progress, and refresh video gallery on success",
+        "status": "implemented",
+        "plannedFiles": [
           "frontend/src/components/admin/VideoUploadSection.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/admin/VideoUploadSection.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-7",
+        "summary": "Connect EventManagementSection create form to backend event creation handler, add file input for optional event image, convert selected image to ExternalBlob when provided, submit event data with name, description, date, optional password, and optional image blob to backend, and refresh events list on success",
+        "status": "implemented",
+        "plannedFiles": [
           "frontend/src/components/admin/EventManagementSection.tsx",
-          "frontend/src/components/admin/SpecialMomentManagementSection.tsx",
-          "frontend/src/components/admin/ShortlistsSection.tsx",
-          "frontend/src/components/admin/VisitorsSection.tsx",
-          "frontend/src/components/admin/FooterEditSection.tsx",
-          "frontend/src/components/admin/UserStatisticsSection.tsx"
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/admin/EventManagementSection.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-8",
+        "summary": "Connect OrdersSection create form to backend order creation handler, validate all required fields including customer name, phone, at least one line item with quantity and price, delivery address, payment amount and method, calculate total from line items, submit complete order data to backend, and refresh orders list on success",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/admin/OrdersSection.tsx",
+          "frontend/src/components/admin/OrderLineItemsEditor.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/admin/OrdersSection.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-9",
+        "summary": "Update PhotosViewer component to fetch photos from backend using existing usePhotos query hook, map photo records to display name, description, category, and render photo blobs as images using blob-utils to convert ExternalBlob to URL, and show empty state when no photos exist",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/PhotosViewer.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/PhotosPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/PhotosViewer.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/PhotosPage.tsx"
         ]
       }
     ]
@@ -106,47 +125,23 @@
     "backend/main.mo",
     "backend/migration.mo",
     "build-request.json",
+    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
-    "frontend/src/components/Footer.tsx",
-    "frontend/src/components/Header.tsx",
-    "frontend/src/components/PhotoActions.tsx",
     "frontend/src/components/PhotosViewer.tsx",
-    "frontend/src/components/ProfileSetupModal.tsx",
     "frontend/src/components/admin/EventManagementSection.tsx",
-    "frontend/src/components/admin/FooterEditSection.tsx",
-    "frontend/src/components/admin/OrderLineItemsEditor.tsx",
     "frontend/src/components/admin/OrdersSection.tsx",
     "frontend/src/components/admin/PhotoUploadSection.tsx",
-    "frontend/src/components/admin/ShortlistsSection.tsx",
-    "frontend/src/components/admin/SpecialMomentManagementSection.tsx",
-    "frontend/src/components/admin/UserStatisticsSection.tsx",
     "frontend/src/components/admin/VideoUploadSection.tsx",
-    "frontend/src/components/admin/VisitorsSection.tsx",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
     "frontend/src/hooks/useQueries.ts",
-    "frontend/src/lib/blob-utils.ts",
-    "frontend/src/lib/time-utils.ts",
-    "frontend/src/pages/AdminPage.tsx",
-    "frontend/src/pages/BusinessInfoPage.tsx",
-    "frontend/src/pages/EventDetailPage.tsx",
-    "frontend/src/pages/EventPage.tsx",
     "frontend/src/pages/EventsPage.tsx",
-    "frontend/src/pages/FavoritesPage.tsx",
-    "frontend/src/pages/HomePage.tsx",
-    "frontend/src/pages/MediaGroupPage.tsx",
-    "frontend/src/pages/PhotoDetailPage.tsx",
     "frontend/src/pages/PhotosPage.tsx",
-    "frontend/src/pages/PortfolioPage.tsx",
-    "frontend/src/pages/SpecialMomentPage.tsx",
-    "frontend/src/pages/SpecialMomentsPage.tsx",
     "frontend/src/pages/VideosPage.tsx",
-    "frontend/src/types/orders.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

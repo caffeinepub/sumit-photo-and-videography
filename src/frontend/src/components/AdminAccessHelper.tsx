@@ -5,19 +5,20 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ShieldAlert, Copy, CheckCircle2, Info, RefreshCw, Terminal } from 'lucide-react';
+import { ShieldAlert, Copy, CheckCircle2, Info, Terminal, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
+import { useInitializeAccessControl, useAssignUserRole } from '../hooks/useQueries';
+import { UserRole } from '../backend';
 
 export default function AdminAccessHelper() {
-  const { identity, clear } = useInternetIdentity();
+  const { identity } = useInternetIdentity();
   const [copied, setCopied] = useState(false);
-  const [copiedCommand, setCopiedCommand] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(false);
+  const [targetPrincipal, setTargetPrincipal] = useState('');
+  
+  const initializeAccessControl = useInitializeAccessControl();
+  const assignUserRole = useAssignUserRole();
 
   const principalId = identity?.getPrincipal().toString() || '';
-
-  // Known admin principal for Sumit (this should match the backend initialization)
-  const sumitPrincipal = 'YOUR_SUMIT_PRINCIPAL_HERE'; // Replace with actual principal
 
   const handleCopyPrincipal = () => {
     navigator.clipboard.writeText(principalId);
@@ -26,23 +27,36 @@ export default function AdminAccessHelper() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleCopyCommand = () => {
-    const command = `dfx canister call backend assignCallerUserRole '(principal "${principalId}", variant { admin })'`;
-    navigator.clipboard.writeText(command);
-    setCopiedCommand(true);
-    toast.success('Command copied to clipboard');
-    setTimeout(() => setCopiedCommand(false), 2000);
+  const handleClaimAdmin = async () => {
+    try {
+      await initializeAccessControl.mutateAsync();
+    } catch (error: any) {
+      // Error is already handled by the mutation
+      console.error('Failed to claim admin:', error);
+    }
   };
 
-  const handleReInitialize = async () => {
-    toast.info('Logging out to re-initialize...');
-    await clear();
-    toast.info('Please add ?caffeineAdminToken=YOUR_SECRET to the URL and log in again');
+  const handleAssignRole = async () => {
+    if (!targetPrincipal.trim()) {
+      toast.error('Please enter a principal ID');
+      return;
+    }
+    
+    try {
+      await assignUserRole.mutateAsync({
+        principal: targetPrincipal.trim(),
+        role: UserRole.admin,
+      });
+      setTargetPrincipal('');
+    } catch (error: any) {
+      // Error is already handled by the mutation
+      console.error('Failed to assign role:', error);
+    }
   };
 
   return (
     <div className="space-y-6">
-      <Alert className="glass-strong border-accent/50">
+      <Alert className="border-accent/50">
         <ShieldAlert className="h-5 w-5 text-accent" />
         <AlertTitle className="text-lg">Admin Access Required</AlertTitle>
         <AlertDescription className="text-base">
@@ -50,7 +64,7 @@ export default function AdminAccessHelper() {
         </AlertDescription>
       </Alert>
 
-      <Card className="glass-strong">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Info className="h-5 w-5 text-accent" />
@@ -66,13 +80,13 @@ export default function AdminAccessHelper() {
                 id="principal"
                 value={principalId}
                 readOnly
-                className="font-mono text-sm glass"
+                className="font-mono text-sm"
               />
               <Button
                 variant="outline"
                 size="icon"
                 onClick={handleCopyPrincipal}
-                className="glass flex-shrink-0"
+                className="flex-shrink-0"
               >
                 {copied ? (
                   <CheckCircle2 className="h-4 w-4 text-green-500" />
@@ -85,145 +99,96 @@ export default function AdminAccessHelper() {
         </CardContent>
       </Card>
 
-      <Card className="glass-strong">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <RefreshCw className="h-5 w-5 text-accent" />
-            How to Gain Admin Access
+            <UserPlus className="h-5 w-5 text-accent" />
+            Claim Admin Access
           </CardTitle>
-          <CardDescription>Follow these steps to become an administrator</CardDescription>
+          <CardDescription>
+            If no admin exists yet, you can claim admin access for yourself
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-3">
-            <div className="flex gap-3">
-              <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-accent/20 text-sm font-bold text-accent">
-                1
-              </div>
-              <div>
-                <p className="font-semibold mb-1">Copy your Principal ID</p>
-                <p className="text-sm text-muted-foreground">
-                  Use the copy button above to copy your principal ID to the clipboard.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-accent/20 text-sm font-bold text-accent">
-                2
-              </div>
-              <div>
-                <p className="font-semibold mb-1">Contact the System Administrator</p>
-                <p className="text-sm text-muted-foreground">
-                  Share your principal ID with the person who deployed this application. They can assign you admin privileges using the backend canister.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-accent/20 text-sm font-bold text-accent">
-                3
-              </div>
-              <div>
-                <p className="font-semibold mb-1">Alternative: Use Admin Token (Advanced)</p>
-                <p className="text-sm text-muted-foreground mb-2">
-                  If you have the admin secret token, you can re-initialize the access control system.
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowInstructions(!showInstructions)}
-                  className="glass"
-                >
-                  {showInstructions ? 'Hide' : 'Show'} Advanced Instructions
-                </Button>
-              </div>
-            </div>
-
-            {showInstructions && (
-              <div className="ml-10 space-y-3 rounded-lg border border-accent/30 bg-accent/5 p-4">
-                <p className="text-sm font-semibold text-accent">Advanced Method:</p>
-                <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
-                  <li>Log out from your current session</li>
-                  <li>Add <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">?caffeineAdminToken=YOUR_SECRET</code> to the URL</li>
-                  <li>Log in again with Internet Identity</li>
-                  <li>You will be assigned as the admin automatically</li>
-                </ol>
-                <Alert className="mt-3 border-amber-500/50 bg-amber-500/10">
-                  <Info className="h-4 w-4 text-amber-500" />
-                  <AlertDescription className="text-xs text-amber-200">
-                    <strong>Note:</strong> The admin token is set during canister deployment. If you don't have it, contact the system administrator.
-                  </AlertDescription>
-                </Alert>
-                <Button
-                  variant="outline"
-                  onClick={handleReInitialize}
-                  className="w-full glass mt-3"
-                >
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Log Out to Re-Initialize
-                </Button>
-              </div>
-            )}
-          </div>
+          <p className="text-sm text-muted-foreground">
+            Click the button below to attempt to claim admin access. This will only work if no admin has been assigned yet.
+          </p>
+          <Button
+            onClick={handleClaimAdmin}
+            disabled={initializeAccessControl.isPending}
+            className="w-full"
+          >
+            {initializeAccessControl.isPending ? 'Claiming...' : 'Claim Admin Access'}
+          </Button>
+          <Alert className="border-yellow-500/50 bg-yellow-500/10">
+            <Info className="h-4 w-4 text-yellow-500" />
+            <AlertDescription className="text-xs">
+              <strong>Note:</strong> If an admin already exists, this will fail with an error message.
+            </AlertDescription>
+          </Alert>
         </CardContent>
       </Card>
 
-      <Card className="glass-strong border-blue-500/30">
+      <Card className="border-blue-500/30">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-blue-400">
             <Terminal className="h-5 w-5" />
-            For Developers
+            Assign Admin Role (Admin Only)
           </CardTitle>
-          <CardDescription>Use these commands to assign admin privileges via dfx</CardDescription>
+          <CardDescription>
+            If you are already an admin, you can assign admin role to another user
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold">
-                Assign Admin Role Command:
-              </p>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleCopyCommand}
-                className="h-8"
-              >
-                {copiedCommand ? (
-                  <CheckCircle2 className="h-4 w-4 text-green-500" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-            <code className="block rounded-lg bg-muted p-3 font-mono text-xs overflow-x-auto">
-              {`dfx canister call backend assignCallerUserRole '(principal "${principalId}", variant { admin })'`}
-            </code>
+            <Label htmlFor="targetPrincipal">Target Principal ID</Label>
+            <Input
+              id="targetPrincipal"
+              value={targetPrincipal}
+              onChange={(e) => setTargetPrincipal(e.target.value)}
+              placeholder="Enter principal ID to make admin"
+              className="font-mono text-sm"
+            />
           </div>
-          
-          <Alert className="border-yellow-500/50 bg-yellow-500/10">
-            <Info className="h-4 w-4 text-yellow-500" />
-            <AlertDescription className="text-xs text-yellow-200">
-              <strong>Important:</strong> Run this command from your terminal where you have dfx installed and the project deployed.
+          <Button
+            onClick={handleAssignRole}
+            disabled={assignUserRole.isPending || !targetPrincipal.trim()}
+            className="w-full"
+          >
+            {assignUserRole.isPending ? 'Assigning...' : 'Assign Admin Role'}
+          </Button>
+          <Alert className="border-blue-500/50 bg-blue-500/10">
+            <Info className="h-4 w-4 text-blue-500" />
+            <AlertDescription className="text-xs">
+              <strong>Important:</strong> Only existing admins can assign roles to other users.
             </AlertDescription>
           </Alert>
+        </CardContent>
+      </Card>
 
-          <div className="space-y-2 pt-2 border-t border-border/50">
-            <p className="text-sm font-semibold">
-              Restore Sumit's Admin Access:
-            </p>
-            <p className="text-xs text-muted-foreground mb-2">
-              If Sumit needs to regain admin access, use this command with Sumit's principal ID:
-            </p>
-            <code className="block rounded-lg bg-muted p-3 font-mono text-xs overflow-x-auto">
-              {`dfx canister call backend assignCallerUserRole '(principal "SUMIT_PRINCIPAL_ID", variant { admin })'`}
-            </code>
-            <p className="text-xs text-muted-foreground mt-2">
-              Replace <code className="rounded bg-muted px-1 py-0.5">SUMIT_PRINCIPAL_ID</code> with Sumit's actual principal ID.
-            </p>
-          </div>
+      <Card className="border-gray-500/30">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Terminal className="h-5 w-5" />
+            Alternative: Use dfx Command Line
+          </CardTitle>
+          <CardDescription>For developers with terminal access</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            If you have access to the dfx command line tool, you can assign admin role directly:
+          </p>
+          <code className="block rounded-lg bg-muted p-3 font-mono text-xs overflow-x-auto">
+            {`dfx canister call backend assignCallerUserRole '(principal "${principalId}", variant { admin })'`}
+          </code>
+          <Alert className="border-yellow-500/50 bg-yellow-500/10">
+            <Info className="h-4 w-4 text-yellow-500" />
+            <AlertDescription className="text-xs">
+              <strong>Note:</strong> Run this command from your terminal where you have dfx installed and the project deployed.
+            </AlertDescription>
+          </Alert>
         </CardContent>
       </Card>
     </div>
   );
 }
-

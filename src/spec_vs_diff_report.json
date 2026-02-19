@@ -1,86 +1,65 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T07:08:40.193Z",
-  "summary": "The diff restores top-level routes and header navigation for Photos/Videos/Events (and several additional sections), but it introduces placeholder/non-functional admin management sections and appears to break existing Orders functionality by stubbing backend calls in frontend query hooks. Some unrequested UI/branding changes were also added (footer link and mandatory profile setup modal).",
+  "generatedAt": "2026-02-19T10:03:48.233Z",
+  "summary": "The implementation covers most requirements but has critical gaps: backend endpoints (uploadPhoto, uploadVideo, createEvent, createOrder) are NOT implemented in main.mo, frontend components are fully built but cannot function without these backend methods, and the migration file suggests structural changes without actual endpoint implementations.",
   "missing_requirements": [
     {
-      "id": "REQ-4",
-      "requirement": "Admin panel navigation and sections beyond Orders must provide functional UI (at least listing existing entities and create/update/delete or upload flows where applicable), not empty/placeholder content.",
-      "reason": "The restored admin sections shown are explicitly placeholders (\"coming soon\"), with disabled primary action buttons and no listing/CUD flows.",
+      "id": "REQ-1",
+      "requirement": "Implement backend photo upload handler that accepts ExternalBlob data with name, description, and category, stores the blob in stable memory, and returns the created photo record with generated ID and timestamp",
+      "reason": "Backend main.mo defines PhotoVideoUploadRequest type and Photo type but does not implement the uploadPhoto() method that accepts these parameters and persists data",
       "evidence": [
-        "frontend/src/components/admin/PhotoUploadSection.tsx",
-        "frontend/src/components/admin/VideoUploadSection.tsx",
-        "frontend/src/components/admin/EventManagementSection.tsx",
-        "frontend/src/components/admin/SpecialMomentManagementSection.tsx",
-        "frontend/src/components/admin/FooterEditSection.tsx"
+        "backend/main.mo"
       ]
     },
     {
-      "id": "REQ-1",
-      "requirement": "Keep the existing Orders functionality working and accessible at /admin.",
-      "reason": "Orders data fetching/mutations are stubbed out with comments like \"Backend methods don't exist yet\" and mutations throw \"Backend method not implemented\", which would prevent Orders from functioning.",
+      "id": "REQ-2",
+      "requirement": "Implement backend video upload handler that accepts ExternalBlob data with name and description, stores the blob in stable memory, and returns the created video record with generated ID and timestamp",
+      "reason": "Backend main.mo defines VideoUploadRequest type and Video type but does not implement the uploadVideo() method to handle video uploads",
       "evidence": [
-        "frontend/src/hooks/useQueries.ts"
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "Implement backend event creation handler that accepts event name, description, date, optional password, and optional image blob, stores the event with generated ID, and returns the complete event record",
+      "reason": "Backend main.mo defines EventCreateRequest type but does not implement the createEvent() method that the frontend mutation calls",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Implement backend order creation handler that accepts customer name, phone, line items with quantities, delivery address, payment amount and method, stores the order with generated ID, and returns the complete order record with pending status",
+      "reason": "Backend main.mo defines CreateOrderRequest and Order types but does not implement the createOrder() method with order persistence logic",
+      "evidence": [
+        "backend/main.mo"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added a promotional footer link to caffeine.ai (branding/attribution) not mentioned in the BuildRequest.",
-      "reason": "BuildRequest does not request adding external promotional links or changing footer branding in this way.",
+      "description": "Migration module for data structure transformation",
+      "reason": "BuildRequest does not specify data migration or version recovery as a requirement; non-goals explicitly state 'Recovering data from previous application versions'",
       "evidence": [
-        "frontend/src/components/Footer.tsx"
-      ]
-    },
-    {
-      "description": "Added a profile setup modal that prompts authenticated users to enter their name and saves a user profile.",
-      "reason": "BuildRequest does not request adding a forced profile onboarding flow/modal as part of restoring sections.",
-      "evidence": [
-        "frontend/src/components/ProfileSetupModal.tsx",
-        "frontend/src/App.tsx"
+        "backend/migration.mo"
       ]
     }
   ],
-  "confidence": 0.74,
+  "confidence": 0.92,
   "changed_files": [
     "backend/main.mo",
     "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/App.tsx",
-    "frontend/src/components/Footer.tsx",
-    "frontend/src/components/Header.tsx",
-    "frontend/src/components/PhotoActions.tsx",
     "frontend/src/components/PhotosViewer.tsx",
-    "frontend/src/components/ProfileSetupModal.tsx",
     "frontend/src/components/admin/EventManagementSection.tsx",
-    "frontend/src/components/admin/FooterEditSection.tsx",
-    "frontend/src/components/admin/OrderLineItemsEditor.tsx",
     "frontend/src/components/admin/OrdersSection.tsx",
     "frontend/src/components/admin/PhotoUploadSection.tsx",
-    "frontend/src/components/admin/ShortlistsSection.tsx",
-    "frontend/src/components/admin/SpecialMomentManagementSection.tsx",
-    "frontend/src/components/admin/UserStatisticsSection.tsx",
     "frontend/src/components/admin/VideoUploadSection.tsx",
-    "frontend/src/components/admin/VisitorsSection.tsx",
     "frontend/src/hooks/useQueries.ts",
-    "frontend/src/lib/blob-utils.ts",
-    "frontend/src/lib/time-utils.ts",
-    "frontend/src/pages/AdminPage.tsx",
-    "frontend/src/pages/BusinessInfoPage.tsx",
-    "frontend/src/pages/EventDetailPage.tsx",
-    "frontend/src/pages/EventPage.tsx",
     "frontend/src/pages/EventsPage.tsx",
-    "frontend/src/pages/FavoritesPage.tsx",
-    "frontend/src/pages/HomePage.tsx",
-    "frontend/src/pages/MediaGroupPage.tsx",
-    "frontend/src/pages/PhotoDetailPage.tsx",
     "frontend/src/pages/PhotosPage.tsx",
-    "frontend/src/pages/PortfolioPage.tsx",
-    "frontend/src/pages/SpecialMomentPage.tsx",
-    "frontend/src/pages/SpecialMomentsPage.tsx",
     "frontend/src/pages/VideosPage.tsx",
-    "frontend/src/types/orders.ts",
     "project_state.json"
   ]
 }

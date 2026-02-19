@@ -10,6 +10,79 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface CreateOrderRequest {
+  'customerName' : string,
+  'orderDate' : Time,
+  'fulfillDate' : Time,
+  'numberOfDvd' : bigint,
+  'items' : Array<OrderField>,
+  'numberOfPrints' : bigint,
+  'payment' : PaymentFields,
+}
+export interface EventCreateRequest {
+  'date' : Time,
+  'password' : [] | [string],
+  'name' : string,
+  'description' : string,
+  'image' : [] | [ExternalBlob],
+}
+export interface EventDTO {
+  'id' : bigint,
+  'date' : Time,
+  'password' : [] | [string],
+  'name' : string,
+  'description' : string,
+  'images' : Array<EventImage>,
+}
+export interface EventImage {
+  'id' : string,
+  'blob' : ExternalBlob,
+  'name' : string,
+  'description' : string,
+  'category' : string,
+  'uploadTime' : Time,
+}
+export type ExternalBlob = Uint8Array;
+export interface Order {
+  'id' : bigint,
+  'customerName' : string,
+  'status' : OrderStatus,
+  'orderDate' : Time,
+  'fulfillDate' : Time,
+  'numberOfDvd' : bigint,
+  'items' : Array<OrderField>,
+  'numberOfPrints' : bigint,
+  'payment' : PaymentFields,
+}
+export interface OrderField {
+  'itemName' : string,
+  'quantity' : bigint,
+  'unitPrice' : bigint,
+}
+export type OrderStatus = { 'Cancelled' : null } |
+  { 'Fulfilled' : null } |
+  { 'Pending' : null };
+export interface PaymentFields {
+  'total' : bigint,
+  'remainingDue' : bigint,
+  'advance' : bigint,
+}
+export interface Photo {
+  'id' : string,
+  'likeCount' : bigint,
+  'blob' : ExternalBlob,
+  'name' : string,
+  'description' : string,
+  'category' : string,
+  'uploadTime' : Time,
+}
+export interface PhotoVideoUploadRequest {
+  'blob' : ExternalBlob,
+  'name' : string,
+  'description' : string,
+  'category' : string,
+}
+export type Time = bigint;
 export interface UserProfile {
   'name' : string,
   'email' : string,
@@ -19,6 +92,18 @@ export interface UserProfile {
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
+export interface Video {
+  'id' : string,
+  'blob' : ExternalBlob,
+  'name' : string,
+  'description' : string,
+  'uploadTime' : Time,
+}
+export interface VideoUploadRequest {
+  'blob' : ExternalBlob,
+  'name' : string,
+  'description' : string,
+}
 export interface _CaffeineStorageCreateCertificateResult {
   'method' : string,
   'blob_hash' : string,
@@ -47,12 +132,16 @@ export interface _SERVICE {
   >,
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'createEvent' : ActorMethod<[EventCreateRequest], EventDTO>,
+  'createOrder' : ActorMethod<[CreateOrderRequest], Order>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'initializeAccessControl' : ActorMethod<[], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'uploadPhoto' : ActorMethod<[PhotoVideoUploadRequest], Photo>,
+  'uploadVideo' : ActorMethod<[VideoUploadRequest], Video>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

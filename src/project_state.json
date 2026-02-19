@@ -1,34 +1,64 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
-  "architectural_notes": [],
+  "summary": "Event management and ordering platform with photo/video gallery, admin-controlled event creation, and customer order processing system",
+  "architectural_notes": [
+    "Motoko backend for data persistence and storage",
+    "React frontend for admin and user interfaces",
+    "Multiple file upload support for photos and videos",
+    "Internet Identity integration for secure admin access"
+  ],
   "known_issues": [
-    "App currently only shows the order section; other sections (photos, videos, events, etc.) were removed and need to be restored."
+    "Previous build attempts failed - may need simplified scope or phased implementation",
+    "Fresh build will not recover existing data from previous versions"
   ],
   "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-restore-the-application-s-previously-available-top-level-sections-so-the-ui-is-not-limited-to-the-orders-admin-section-at-minimum-re-add-working-routes-and-pages-for-photos-videos-events-and-any-related-sections-that-previously-existed-in-the-app-e-g-special-moments-favorites-portfolio-business-info-media-groups-so-users-can-navigate-to-them-again",
-      "title": "Restore the application’s previously available top-level sections so the UI is not limited to the Orders admin section. At minimum, re-add working routes and pages for Photos, Videos, Events, and any related sections that previously existed in the app (e.g., Special Moments, Favorites, Portfolio, Business Info, Media Groups) so users can navigate to them again.",
+      "id": "feature-connect-photouploadsection-component-to-backend-upload-handler-enable-multiple-file-selection-in-the-file-input-process-each-selected-file-through-upload-utils-to-create-externalblob-call-backend-upload-mutation-for-each-photo-show-upload-progress-and-refresh-photo-gallery-on-success",
+      "title": "Connect PhotoUploadSection component to backend upload handler, enable multiple file selection in the file input, process each selected file through upload-utils to create ExternalBlob, call backend upload mutation for each photo, show upload progress, and refresh photo gallery on success",
       "reqIds": [
-        "REQ-1"
+        "REQ-5"
       ],
       "version": 1
     },
     {
-      "id": "feature-restore-the-content-and-ui-structure-for-the-restored-sections-photos-videos-events-etc-so-they-resemble-the-previous-multi-section-experience-rather-than-an-order-only-landing-page-ensure-user-facing-labels-and-messages-are-in-english",
-      "title": "Restore the content and UI structure for the restored sections (Photos, Videos, Events, etc.) so they resemble the previous multi-section experience rather than an order-only landing page. Ensure user-facing labels and messages are in English.",
+      "id": "feature-connect-videouploadsection-component-to-backend-upload-handler-enable-multiple-file-selection-in-the-file-input-process-each-selected-file-through-upload-utils-to-create-externalblob-call-backend-upload-mutation-for-each-video-show-upload-progress-and-refresh-video-gallery-on-success",
+      "title": "Connect VideoUploadSection component to backend upload handler, enable multiple file selection in the file input, process each selected file through upload-utils to create ExternalBlob, call backend upload mutation for each video, show upload progress, and refresh video gallery on success",
       "reqIds": [
-        "REQ-2"
+        "REQ-6"
       ],
       "version": 1
     },
     {
-      "id": "feature-restore-admin-panel-navigation-and-sections-beyond-orders-e-g-photo-upload-management-video-upload-management-event-management-special-moment-management-shortlists-visitors-footer-editing-user-statistics-so-admins-can-manage-all-previously-available-content-areas-from-the-admin-ui",
-      "title": "Restore admin panel navigation and sections beyond Orders (e.g., Photo upload/management, Video upload/management, Event management, Special moment management, Shortlists, Visitors, Footer editing, User statistics) so admins can manage all previously available content areas from the admin UI.",
+      "id": "feature-connect-eventmanagementsection-create-form-to-backend-event-creation-handler-add-file-input-for-optional-event-image-convert-selected-image-to-externalblob-when-provided-submit-event-data-with-name-description-date-optional-password-and-optional-image-blob-to-backend-and-refresh-events-list-on-success",
+      "title": "Connect EventManagementSection create form to backend event creation handler, add file input for optional event image, convert selected image to ExternalBlob when provided, submit event data with name, description, date, optional password, and optional image blob to backend, and refresh events list on success",
       "reqIds": [
-        "REQ-4"
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-connect-orderssection-create-form-to-backend-order-creation-handler-validate-all-required-fields-including-customer-name-phone-at-least-one-line-item-with-quantity-and-price-delivery-address-payment-amount-and-method-calculate-total-from-line-items-submit-complete-order-data-to-backend-and-refresh-orders-list-on-success",
+      "title": "Connect OrdersSection create form to backend order creation handler, validate all required fields including customer name, phone, at least one line item with quantity and price, delivery address, payment amount and method, calculate total from line items, submit complete order data to backend, and refresh orders list on success",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-photosviewer-component-to-fetch-photos-from-backend-using-existing-usephotos-query-hook-map-photo-records-to-display-name-description-category-and-render-photo-blobs-as-images-using-blob-utils-to-convert-externalblob-to-url-and-show-empty-state-when-no-photos-exist",
+      "title": "Update PhotosViewer component to fetch photos from backend using existing usePhotos query hook, map photo records to display name, description, category, and render photo blobs as images using blob-utils to convert ExternalBlob to URL, and show empty state when no photos exist",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-videospage-to-fetch-videos-from-backend-using-existing-usevideos-query-hook-render-video-list-with-name-and-description-display-video-blobs-as-playable-html5-video-elements-using-blob-utils-to-convert-externalblob-to-url-and-show-empty-state-when-no-videos-exist",
+      "title": "Update VideosPage to fetch videos from backend using existing useVideos query hook, render video list with name and description, display video blobs as playable HTML5 video elements using blob-utils to convert ExternalBlob to URL, and show empty state when no videos exist",
+      "reqIds": [
+        "REQ-10"
       ],
       "version": 1
     }
@@ -36,20 +66,68 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Restore previously removed sections (photos, videos, events, etc.) so the app shows all sections again, not only the order section",
+      "summary": "Photo upload with multiple file selection, backend storage, and gallery display",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Video upload with multiple file selection, backend storage, and video player",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Event creation form with image upload capability",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-4",
-      "summary": "Restore backend support for the non-order sections (Photos, Videos, Events, Special Moments, Favorites/likes, shortlists, visitors, footer content as applicable) so the restored frontend sections can load and mutate data without runtime failures.",
+      "summary": "Order creation system with customer details (name, phone, items, quantities, delivery address, payment info)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Admin authentication using Internet Identity",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Implement backend photo upload handler that accepts ExternalBlob data with name, description, and category, stores the blob in stable memory, and returns the created photo record with generated ID and timestamp",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Implement backend video upload handler that accepts ExternalBlob data with name and description, stores the blob in stable memory, and returns the created video record with generated ID and timestamp",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Implement backend event creation handler that accepts event name, description, date, optional password, and optional image blob, stores the event with generated ID, and returns the complete event record",
       "reqIds": [
         "REQ-3"
       ],
       "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Implement backend order creation handler that accepts customer name, phone, line items with quantities, delivery address, payment amount and method, stores the order with generated ID, and returns the complete order record with pending status",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "status": "pending"
     }
   ],
-  "projectName": "Studio Portal",
+  "projectName": "Media Portfolio Manager",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

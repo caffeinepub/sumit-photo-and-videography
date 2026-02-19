@@ -1,106 +1,267 @@
 {
   "kind": "build_request",
-  "title": "Restore Photos/Videos/Events sections alongside Orders",
-  "projectName": "Studio Portal",
-  "priority": "normal",
+  "title": "Implement complete photo/video upload and event/order management system",
+  "projectName": "Media Portfolio Manager",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Restore the application’s previously available top-level sections so the UI is not limited to the Orders admin section. At minimum, re-add working routes and pages for Photos, Videos, Events, and any related sections that previously existed in the app (e.g., Special Moments, Favorites, Portfolio, Business Info, Media Groups) so users can navigate to them again.",
-      "target": "frontend",
+      "text": "Implement backend photo upload handler that accepts ExternalBlob data with name, description, and category, stores the blob in stable memory, and returns the created photo record with generated ID and timestamp",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-1",
+          "msg-7",
+          "msg-11",
+          "msg-15"
         ],
         "quotes": [
-          "You removed everything and only showing order section restore all the section like photos videos events etc as like previous"
+          "Photo upload - Multiple file selection with backend storage and gallery display"
         ]
       },
       "acceptanceCriteria": [
-        "App routing includes dedicated routes (not placeholders) for Photos, Videos, and Events pages in addition to existing Home and Admin routes.",
-        "Navigating to the restored routes renders non-empty pages (not blank files) and does not redirect to Home due to notFound routing.",
-        "Header navigation provides visible links (or a menu) to reach the restored sections (Photos/Videos/Events at minimum) without needing to type URLs.",
-        "Orders admin section remains accessible at /admin and continues to function as-is."
+        "Backend accepts photo upload requests with name, description, category, and ExternalBlob data",
+        "Photo data is persisted in stable storage with unique ID",
+        "Upload returns complete photo record including ID, timestamp, and blob reference",
+        "Multiple photos can be uploaded in sequence without data loss"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Restore the content and UI structure for the restored sections (Photos, Videos, Events, etc.) so they resemble the previous multi-section experience rather than an order-only landing page. Ensure user-facing labels and messages are in English.",
-      "target": "frontend",
+      "text": "Implement backend video upload handler that accepts ExternalBlob data with name and description, stores the blob in stable memory, and returns the created video record with generated ID and timestamp",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-1",
+          "msg-7",
+          "msg-11",
+          "msg-15"
         ],
         "quotes": [
-          "restore all the section like photos videos events etc as like previous"
+          "Video upload - Multiple file selection with backend storage and video player"
         ]
       },
       "acceptanceCriteria": [
-        "Home page is updated so it is not exclusively an “Order Management System” marketing page; it includes entry points to the restored sections (Photos/Videos/Events at minimum).",
-        "Each restored section page includes basic layout scaffolding (title, description, primary actions) and does not show empty/blank content.",
-        "All user-facing text introduced/updated by this change is in English."
+        "Backend accepts video upload requests with name, description, and ExternalBlob data",
+        "Video data is persisted in stable storage with unique ID",
+        "Upload returns complete video record including ID, timestamp, and blob reference",
+        "Multiple videos can be uploaded in sequence without data loss"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Restore backend support for the non-order sections (Photos, Videos, Events, Special Moments, Favorites/likes, shortlists, visitors, footer content as applicable) so the restored frontend sections can load and mutate data without runtime failures.",
+      "text": "Implement backend event creation handler that accepts event name, description, date, optional password, and optional image blob, stores the event with generated ID, and returns the complete event record",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-1",
+          "msg-7",
+          "msg-11",
+          "msg-15"
         ],
         "quotes": [
-          "restore all the section like photos videos events etc as like previous"
+          "Event creation - Complete form to create events with image upload capability"
         ]
       },
       "acceptanceCriteria": [
-        "Backend exposes query and update methods needed by the restored sections (at minimum: list and get for Photos/Videos/Events; and admin-only create/upload/update/delete where applicable).",
-        "Access control is enforced consistently: public vs authenticated vs admin actions are protected appropriately (e.g., admin-only uploads/management).",
-        "The restored frontend sections can call the backend actor without throwing runtime traps for missing methods (e.g., “method not found”)."
+        "Backend accepts event creation requests with name, description, date, optional password, and optional image",
+        "Event data is persisted in stable storage with unique ID",
+        "Event images are stored in blob storage and referenced in event records",
+        "Created event is returned with all fields including generated ID and timestamp"
       ]
     },
     {
       "id": "REQ-4",
-      "text": "Restore admin panel navigation and sections beyond Orders (e.g., Photo upload/management, Video upload/management, Event management, Special moment management, Shortlists, Visitors, Footer editing, User statistics) so admins can manage all previously available content areas from the admin UI.",
-      "target": "frontend",
+      "text": "Implement backend order creation handler that accepts customer name, phone, line items with quantities, delivery address, payment amount and method, stores the order with generated ID, and returns the complete order record with pending status",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-1",
+          "msg-7",
+          "msg-11",
+          "msg-15"
         ],
         "quotes": [
-          "restore all the section like photos videos events etc as like previous"
+          "Order creation - Full order system with customer name, phone, items, quantities, delivery address, and payment details"
         ]
       },
       "acceptanceCriteria": [
-        "Admin page no longer renders only OrdersSection; it provides a way to access additional admin sections (tabs/side navigation/accordion is acceptable).",
-        "Each admin section that is currently an empty placeholder renders functional UI (not empty files), at least for listing existing entities and providing create/update/delete or upload flows where applicable.",
-        "Admin access checks remain in place; non-admin users still see the admin access helper flow."
+        "Backend accepts order creation requests with customer name, phone, line items array, delivery address, payment amount, and payment method",
+        "Order data is persisted in stable storage with unique ID and pending status",
+        "Line items are stored with item name, quantity, and price",
+        "Created order is returned with all fields including generated ID, timestamp, and calculated total"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Connect PhotoUploadSection component to backend upload handler, enable multiple file selection in the file input, process each selected file through upload-utils to create ExternalBlob, call backend upload mutation for each photo, show upload progress, and refresh photo gallery on success",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-7",
+          "msg-11",
+          "msg-15"
+        ],
+        "quotes": [
+          "Photo upload - Multiple file selection with backend storage and gallery display"
+        ]
+      },
+      "acceptanceCriteria": [
+        "File input accepts multiple photo files (JPEG, PNG, WebP)",
+        "Each selected file is converted to ExternalBlob using upload-utils",
+        "Upload mutation is called for each photo with name, description, category, and blob data",
+        "Upload progress is displayed for each file",
+        "Success message appears after all uploads complete",
+        "Photo gallery refreshes automatically to show newly uploaded photos"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Connect VideoUploadSection component to backend upload handler, enable multiple file selection in the file input, process each selected file through upload-utils to create ExternalBlob, call backend upload mutation for each video, show upload progress, and refresh video gallery on success",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-7",
+          "msg-11",
+          "msg-15"
+        ],
+        "quotes": [
+          "Video upload - Multiple file selection with backend storage and video player"
+        ]
+      },
+      "acceptanceCriteria": [
+        "File input accepts multiple video files (MP4, WebM, MOV)",
+        "Each selected file is converted to ExternalBlob using upload-utils",
+        "Upload mutation is called for each video with name, description, and blob data",
+        "Upload progress is displayed for each file",
+        "Success message appears after all uploads complete",
+        "Video gallery refreshes automatically to show newly uploaded videos"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Connect EventManagementSection create form to backend event creation handler, add file input for optional event image, convert selected image to ExternalBlob when provided, submit event data with name, description, date, optional password, and optional image blob to backend, and refresh events list on success",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-7",
+          "msg-11",
+          "msg-15"
+        ],
+        "quotes": [
+          "Event creation - Complete form to create events with image upload capability"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Event creation form includes optional image file input",
+        "Form validates required fields (name, description, date) before submission",
+        "Selected image file is converted to ExternalBlob using upload-utils",
+        "Create mutation sends all event data including optional image to backend",
+        "Success message appears after event is created",
+        "Events list refreshes to show the newly created event with image if provided"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Connect OrdersSection create form to backend order creation handler, validate all required fields including customer name, phone, at least one line item with quantity and price, delivery address, payment amount and method, calculate total from line items, submit complete order data to backend, and refresh orders list on success",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-7",
+          "msg-11",
+          "msg-15"
+        ],
+        "quotes": [
+          "Order creation - Full order system with customer name, phone, items, quantities, delivery address, and payment details"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Order creation form validates customer name (non-empty string)",
+        "Phone number field accepts standard phone formats",
+        "OrderLineItemsEditor allows adding multiple items with name, quantity, and price",
+        "Form validates that at least one line item exists before submission",
+        "Delivery address field is validated as non-empty",
+        "Payment amount is automatically calculated from line item totals",
+        "Payment method selection is required (Cash, Card, or Online)",
+        "Create mutation sends complete order data to backend",
+        "Success message appears after order is created",
+        "Orders list refreshes to show the newly created order with all details"
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Update PhotosViewer component to fetch photos from backend using existing usePhotos query hook, map photo records to display name, description, category, and render photo blobs as images using blob-utils to convert ExternalBlob to URL, and show empty state when no photos exist",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-7",
+          "msg-11",
+          "msg-15"
+        ],
+        "quotes": [
+          "Photo upload - Multiple file selection with backend storage and gallery display"
+        ]
+      },
+      "acceptanceCriteria": [
+        "PhotosViewer fetches photos using usePhotos query with selected sort order",
+        "Each photo displays name, description, and category from backend data",
+        "Photo blobs are converted to displayable URLs using blob-utils",
+        "Grid layout displays photos responsively",
+        "Loading state shows while photos are being fetched",
+        "Empty state message displays when no photos exist",
+        "Error state displays if photo fetch fails"
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "text": "Update VideosPage to fetch videos from backend using existing useVideos query hook, render video list with name and description, display video blobs as playable HTML5 video elements using blob-utils to convert ExternalBlob to URL, and show empty state when no videos exist",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-7",
+          "msg-11",
+          "msg-15"
+        ],
+        "quotes": [
+          "Video upload - Multiple file selection with backend storage and video player"
+        ]
+      },
+      "acceptanceCriteria": [
+        "VideosPage fetches videos using useVideos query with selected sort order",
+        "Each video displays name and description from backend data",
+        "Video blobs are converted to playable URLs using blob-utils",
+        "HTML5 video player renders each video with standard controls",
+        "Loading state shows while videos are being fetched",
+        "Empty state message displays when no videos exist",
+        "Error state displays if video fetch fails"
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/src/components/ui (Shadcn UI is read-only and must be composed, not modified).",
-    "Do not edit immutable hook entrypoints: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx.",
-    "Backend must remain a single Motoko actor in backend/main.mo; only add backend/migration.mo changes if an upgrade requires state migration.",
-    "Keep the existing Orders functionality working and accessible at /admin."
+    "All backend logic must remain in the single main.mo actor file",
+    "Do not modify frontend/src/hooks/useInternetIdentity.ts or frontend/src/hooks/useActor.ts",
+    "Do not edit files in frontend/src/components/ui directory",
+    "Use existing blob-storage mixin pattern for file storage",
+    "Use existing ExternalBlob type for all blob data transfers",
+    "Maintain Internet Identity authentication for admin access"
   ],
   "nonGoals": [
-    "Do not introduce third-party authentication providers (only Internet Identity is supported).",
-    "Do not add external databases or non-IC storage services.",
-    "Do not add real-time features such as WebSockets or push notifications."
+    "Recovering data from previous application versions",
+    "Real-time upload progress bars (basic progress indication is sufficient)",
+    "Image compression or optimization before upload",
+    "Video transcoding or format conversion",
+    "Advanced order payment processing or payment gateway integration",
+    "Event RSVP or ticketing functionality",
+    "User roles beyond admin authentication"
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

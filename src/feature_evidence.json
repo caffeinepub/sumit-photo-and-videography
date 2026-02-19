@@ -2,22 +2,126 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-restore-the-application-s-previously-available-top-level-sections-so-the-ui-is-not-limited-to-the-orders-admin-section-at-minimum-re-add-working-routes-and-pages-for-photos-videos-events-and-any-related-sections-that-previously-existed-in-the-app-e-g-special-moments-favorites-portfolio-business-info-media-groups-so-users-can-navigate-to-them-again",
-      "featureTitle": "Restore the application’s previously available top-level sections so the UI is not limited to the Orders admin section. At minimum, re-add working routes and pages for Photos, Videos, Events, and any related sections that previously existed in the app (e.g., Special Moments, Favorites, Portfolio, Business Info, Media Groups) so users can navigate to them again.",
+      "featureId": "feature-connect-photouploadsection-component-to-backend-upload-handler-enable-multiple-file-selection-in-the-file-input-process-each-selected-file-through-upload-utils-to-create-externalblob-call-backend-upload-mutation-for-each-photo-show-upload-progress-and-refresh-photo-gallery-on-success",
+      "featureTitle": "Connect PhotoUploadSection component to backend upload handler, enable multiple file selection in the file input, process each selected file through upload-utils to create ExternalBlob, call backend upload mutation for each photo, show upload progress, and refresh photo gallery on success",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/Header.tsx",
-        "frontend/src/pages/BusinessInfoPage.tsx",
-        "frontend/src/pages/EventDetailPage.tsx",
-        "frontend/src/pages/EventPage.tsx",
-        "frontend/src/pages/EventsPage.tsx",
-        "frontend/src/pages/FavoritesPage.tsx",
-        "frontend/src/pages/MediaGroupPage.tsx",
-        "frontend/src/pages/PhotoDetailPage.tsx",
-        "frontend/src/pages/PhotosPage.tsx",
-        "frontend/src/pages/PortfolioPage.tsx",
-        "frontend/src/pages/SpecialMomentPage.tsx",
-        "frontend/src/pages/SpecialMomentsPage.tsx",
+        "frontend/src/components/admin/PhotoUploadSection.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "authorization@3.0.0",
+        "blob-storage@4.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-connect-videouploadsection-component-to-backend-upload-handler-enable-multiple-file-selection-in-the-file-input-process-each-selected-file-through-upload-utils-to-create-externalblob-call-backend-upload-mutation-for-each-video-show-upload-progress-and-refresh-video-gallery-on-success",
+      "featureTitle": "Connect VideoUploadSection component to backend upload handler, enable multiple file selection in the file input, process each selected file through upload-utils to create ExternalBlob, call backend upload mutation for each video, show upload progress, and refresh video gallery on success",
+      "files": [
+        "frontend/src/components/admin/VideoUploadSection.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "authorization@3.0.0",
+        "blob-storage@4.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-connect-eventmanagementsection-create-form-to-backend-event-creation-handler-add-file-input-for-optional-event-image-convert-selected-image-to-externalblob-when-provided-submit-event-data-with-name-description-date-optional-password-and-optional-image-blob-to-backend-and-refresh-events-list-on-success",
+      "featureTitle": "Connect EventManagementSection create form to backend event creation handler, add file input for optional event image, convert selected image to ExternalBlob when provided, submit event data with name, description, date, optional password, and optional image blob to backend, and refresh events list on success",
+      "files": [
+        "frontend/src/components/admin/EventManagementSection.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "authorization@3.0.0",
+        "blob-storage@4.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-connect-orderssection-create-form-to-backend-order-creation-handler-validate-all-required-fields-including-customer-name-phone-at-least-one-line-item-with-quantity-and-price-delivery-address-payment-amount-and-method-calculate-total-from-line-items-submit-complete-order-data-to-backend-and-refresh-orders-list-on-success",
+      "featureTitle": "Connect OrdersSection create form to backend order creation handler, validate all required fields including customer name, phone, at least one line item with quantity and price, delivery address, payment amount and method, calculate total from line items, submit complete order data to backend, and refresh orders list on success",
+      "files": [
+        "frontend/src/components/admin/OrdersSection.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ],
+      "components": [
+        "authorization@3.0.0",
+        "blob-storage@4.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-photosviewer-component-to-fetch-photos-from-backend-using-existing-usephotos-query-hook-map-photo-records-to-display-name-description-category-and-render-photo-blobs-as-images-using-blob-utils-to-convert-externalblob-to-url-and-show-empty-state-when-no-photos-exist",
+      "featureTitle": "Update PhotosViewer component to fetch photos from backend using existing usePhotos query hook, map photo records to display name, description, category, and render photo blobs as images using blob-utils to convert ExternalBlob to URL, and show empty state when no photos exist",
+      "files": [
+        "frontend/src/components/PhotosViewer.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/PhotosPage.tsx"
+      ],
+      "components": [
+        "authorization@3.0.0",
+        "blob-storage@4.0.0",
+        "qr-code@1.0.0",
+        "camera@1.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-9"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-videospage-to-fetch-videos-from-backend-using-existing-usevideos-query-hook-render-video-list-with-name-and-description-display-video-blobs-as-playable-html5-video-elements-using-blob-utils-to-convert-externalblob-to-url-and-show-empty-state-when-no-videos-exist",
+      "featureTitle": "Update VideosPage to fetch videos from backend using existing useVideos query hook, render video list with name and description, display video blobs as playable HTML5 video elements using blob-utils to convert ExternalBlob to URL, and show empty state when no videos exist",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
         "frontend/src/pages/VideosPage.tsx"
       ],
       "components": [
@@ -32,63 +136,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-restore-the-content-and-ui-structure-for-the-restored-sections-photos-videos-events-etc-so-they-resemble-the-previous-multi-section-experience-rather-than-an-order-only-landing-page-ensure-user-facing-labels-and-messages-are-in-english",
-      "featureTitle": "Restore the content and UI structure for the restored sections (Photos, Videos, Events, etc.) so they resemble the previous multi-section experience rather than an order-only landing page. Ensure user-facing labels and messages are in English.",
-      "files": [
-        "frontend/src/components/Footer.tsx",
-        "frontend/src/components/PhotoActions.tsx",
-        "frontend/src/components/PhotosViewer.tsx",
-        "frontend/src/lib/blob-utils.ts",
-        "frontend/src/pages/HomePage.tsx"
-      ],
-      "components": [
-        "authorization@3.0.0",
-        "blob-storage@4.0.0",
-        "qr-code@1.0.0",
-        "camera@1.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-restore-admin-panel-navigation-and-sections-beyond-orders-e-g-photo-upload-management-video-upload-management-event-management-special-moment-management-shortlists-visitors-footer-editing-user-statistics-so-admins-can-manage-all-previously-available-content-areas-from-the-admin-ui",
-      "featureTitle": "Restore admin panel navigation and sections beyond Orders (e.g., Photo upload/management, Video upload/management, Event management, Special moment management, Shortlists, Visitors, Footer editing, User statistics) so admins can manage all previously available content areas from the admin UI.",
-      "files": [
-        "frontend/src/components/admin/EventManagementSection.tsx",
-        "frontend/src/components/admin/FooterEditSection.tsx",
-        "frontend/src/components/admin/PhotoUploadSection.tsx",
-        "frontend/src/components/admin/ShortlistsSection.tsx",
-        "frontend/src/components/admin/SpecialMomentManagementSection.tsx",
-        "frontend/src/components/admin/UserStatisticsSection.tsx",
-        "frontend/src/components/admin/VideoUploadSection.tsx",
-        "frontend/src/components/admin/VisitorsSection.tsx",
-        "frontend/src/pages/AdminPage.tsx"
-      ],
-      "components": [
-        "authorization@3.0.0",
-        "blob-storage@4.0.0",
-        "qr-code@1.0.0",
-        "camera@1.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
+        "REQ-10"
       ],
       "confidence": "high"
     }

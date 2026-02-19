@@ -24,11 +24,98 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
+export const Time = IDL.Int;
+export const ExternalBlob = IDL.Vec(IDL.Nat8);
+export const EventCreateRequest = IDL.Record({
+  'date' : Time,
+  'password' : IDL.Opt(IDL.Text),
+  'name' : IDL.Text,
+  'description' : IDL.Text,
+  'image' : IDL.Opt(ExternalBlob),
+});
+export const EventImage = IDL.Record({
+  'id' : IDL.Text,
+  'blob' : ExternalBlob,
+  'name' : IDL.Text,
+  'description' : IDL.Text,
+  'category' : IDL.Text,
+  'uploadTime' : Time,
+});
+export const EventDTO = IDL.Record({
+  'id' : IDL.Nat,
+  'date' : Time,
+  'password' : IDL.Opt(IDL.Text),
+  'name' : IDL.Text,
+  'description' : IDL.Text,
+  'images' : IDL.Vec(EventImage),
+});
+export const OrderField = IDL.Record({
+  'itemName' : IDL.Text,
+  'quantity' : IDL.Nat,
+  'unitPrice' : IDL.Nat,
+});
+export const PaymentFields = IDL.Record({
+  'total' : IDL.Nat,
+  'remainingDue' : IDL.Nat,
+  'advance' : IDL.Nat,
+});
+export const CreateOrderRequest = IDL.Record({
+  'customerName' : IDL.Text,
+  'orderDate' : Time,
+  'fulfillDate' : Time,
+  'numberOfDvd' : IDL.Nat,
+  'items' : IDL.Vec(OrderField),
+  'numberOfPrints' : IDL.Nat,
+  'payment' : PaymentFields,
+});
+export const OrderStatus = IDL.Variant({
+  'Cancelled' : IDL.Null,
+  'Fulfilled' : IDL.Null,
+  'Pending' : IDL.Null,
+});
+export const Order = IDL.Record({
+  'id' : IDL.Nat,
+  'customerName' : IDL.Text,
+  'status' : OrderStatus,
+  'orderDate' : Time,
+  'fulfillDate' : Time,
+  'numberOfDvd' : IDL.Nat,
+  'items' : IDL.Vec(OrderField),
+  'numberOfPrints' : IDL.Nat,
+  'payment' : PaymentFields,
+});
 export const UserProfile = IDL.Record({
   'name' : IDL.Text,
   'email' : IDL.Text,
   'address' : IDL.Text,
   'phone' : IDL.Text,
+});
+export const PhotoVideoUploadRequest = IDL.Record({
+  'blob' : ExternalBlob,
+  'name' : IDL.Text,
+  'description' : IDL.Text,
+  'category' : IDL.Text,
+});
+export const Photo = IDL.Record({
+  'id' : IDL.Text,
+  'likeCount' : IDL.Nat,
+  'blob' : ExternalBlob,
+  'name' : IDL.Text,
+  'description' : IDL.Text,
+  'category' : IDL.Text,
+  'uploadTime' : Time,
+});
+export const VideoUploadRequest = IDL.Record({
+  'blob' : ExternalBlob,
+  'name' : IDL.Text,
+  'description' : IDL.Text,
+});
+export const Video = IDL.Record({
+  'id' : IDL.Text,
+  'blob' : ExternalBlob,
+  'name' : IDL.Text,
+  'description' : IDL.Text,
+  'uploadTime' : Time,
 });
 
 export const idlService = IDL.Service({
@@ -59,6 +146,8 @@ export const idlService = IDL.Service({
     ),
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'createEvent' : IDL.Func([EventCreateRequest], [EventDTO], []),
+  'createOrder' : IDL.Func([CreateOrderRequest], [Order], []),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getUserProfile' : IDL.Func(
@@ -69,6 +158,8 @@ export const idlService = IDL.Service({
   'initializeAccessControl' : IDL.Func([], [], []),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'uploadPhoto' : IDL.Func([PhotoVideoUploadRequest], [Photo], []),
+  'uploadVideo' : IDL.Func([VideoUploadRequest], [Video], []),
 });
 
 export const idlInitArgs = [];
@@ -90,11 +181,98 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
+  const Time = IDL.Int;
+  const ExternalBlob = IDL.Vec(IDL.Nat8);
+  const EventCreateRequest = IDL.Record({
+    'date' : Time,
+    'password' : IDL.Opt(IDL.Text),
+    'name' : IDL.Text,
+    'description' : IDL.Text,
+    'image' : IDL.Opt(ExternalBlob),
+  });
+  const EventImage = IDL.Record({
+    'id' : IDL.Text,
+    'blob' : ExternalBlob,
+    'name' : IDL.Text,
+    'description' : IDL.Text,
+    'category' : IDL.Text,
+    'uploadTime' : Time,
+  });
+  const EventDTO = IDL.Record({
+    'id' : IDL.Nat,
+    'date' : Time,
+    'password' : IDL.Opt(IDL.Text),
+    'name' : IDL.Text,
+    'description' : IDL.Text,
+    'images' : IDL.Vec(EventImage),
+  });
+  const OrderField = IDL.Record({
+    'itemName' : IDL.Text,
+    'quantity' : IDL.Nat,
+    'unitPrice' : IDL.Nat,
+  });
+  const PaymentFields = IDL.Record({
+    'total' : IDL.Nat,
+    'remainingDue' : IDL.Nat,
+    'advance' : IDL.Nat,
+  });
+  const CreateOrderRequest = IDL.Record({
+    'customerName' : IDL.Text,
+    'orderDate' : Time,
+    'fulfillDate' : Time,
+    'numberOfDvd' : IDL.Nat,
+    'items' : IDL.Vec(OrderField),
+    'numberOfPrints' : IDL.Nat,
+    'payment' : PaymentFields,
+  });
+  const OrderStatus = IDL.Variant({
+    'Cancelled' : IDL.Null,
+    'Fulfilled' : IDL.Null,
+    'Pending' : IDL.Null,
+  });
+  const Order = IDL.Record({
+    'id' : IDL.Nat,
+    'customerName' : IDL.Text,
+    'status' : OrderStatus,
+    'orderDate' : Time,
+    'fulfillDate' : Time,
+    'numberOfDvd' : IDL.Nat,
+    'items' : IDL.Vec(OrderField),
+    'numberOfPrints' : IDL.Nat,
+    'payment' : PaymentFields,
+  });
   const UserProfile = IDL.Record({
     'name' : IDL.Text,
     'email' : IDL.Text,
     'address' : IDL.Text,
     'phone' : IDL.Text,
+  });
+  const PhotoVideoUploadRequest = IDL.Record({
+    'blob' : ExternalBlob,
+    'name' : IDL.Text,
+    'description' : IDL.Text,
+    'category' : IDL.Text,
+  });
+  const Photo = IDL.Record({
+    'id' : IDL.Text,
+    'likeCount' : IDL.Nat,
+    'blob' : ExternalBlob,
+    'name' : IDL.Text,
+    'description' : IDL.Text,
+    'category' : IDL.Text,
+    'uploadTime' : Time,
+  });
+  const VideoUploadRequest = IDL.Record({
+    'blob' : ExternalBlob,
+    'name' : IDL.Text,
+    'description' : IDL.Text,
+  });
+  const Video = IDL.Record({
+    'id' : IDL.Text,
+    'blob' : ExternalBlob,
+    'name' : IDL.Text,
+    'description' : IDL.Text,
+    'uploadTime' : Time,
   });
   
   return IDL.Service({
@@ -125,6 +303,8 @@ export const idlFactory = ({ IDL }) => {
       ),
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'createEvent' : IDL.Func([EventCreateRequest], [EventDTO], []),
+    'createOrder' : IDL.Func([CreateOrderRequest], [Order], []),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getUserProfile' : IDL.Func(
@@ -135,6 +315,8 @@ export const idlFactory = ({ IDL }) => {
     'initializeAccessControl' : IDL.Func([], [], []),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'uploadPhoto' : IDL.Func([PhotoVideoUploadRequest], [Photo], []),
+    'uploadVideo' : IDL.Func([VideoUploadRequest], [Video], []),
   });
 };
 

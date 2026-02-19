@@ -1,179 +1,165 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Studio Portal — Restore multi-section navigation and admin areas",
+  "title": "Frontend implementation for photo/video upload and event/order management system",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Re-add working top-level routes/pages for Photos, Videos, Events, and previously existing related sections; expose navigation links while keeping /admin Orders working.",
+      "id": "REQ-5",
+      "summary": "Connect PhotoUploadSection to backend upload handler with multiple file selection and progress tracking",
       "acceptanceCriteria": [
-        "App routing includes dedicated routes (not placeholders) for Photos, Videos, and Events pages in addition to existing Home and Admin routes.",
-        "Navigating to the restored routes renders non-empty pages (not blank files) and does not redirect to Home due to notFound routing.",
-        "Header navigation provides visible links (or a menu) to reach the restored sections (Photos/Videos/Events at minimum) without needing to type URLs.",
-        "Orders admin section remains accessible at /admin and continues to function as-is."
+        "File input accepts multiple photo files (JPEG, PNG, WebP)",
+        "Each selected file is converted to ExternalBlob using upload-utils",
+        "Upload mutation is called for each photo with name, description, category, and blob data",
+        "Upload progress is displayed for each file",
+        "Success message appears after all uploads complete",
+        "Photo gallery refreshes automatically to show newly uploaded photos"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/components/admin/PhotoUploadSection.tsx",
           "operation": "modify",
-          "description": "Register TanStack Router routes for restored public sections: /photos, /videos, /events (minimum), and wire existing related pages that previously existed (e.g., /favorites, /portfolio, /business-info, /special-moments, /media-groups and any detail routes that already have page files) so they render real pages and are not caught by the notFound redirect."
+          "description": "Enable multiple file selection by adding the 'multiple' attribute to the file input element. Implement file iteration logic to process each selected file through upload-utils.ts to create ExternalBlob instances. For each photo, call the uploadPhoto mutation from useQueries.ts with name, description, category, and blob data. Track upload progress using ExternalBlob.withUploadProgress() and display progress indicators. Show success messages after all uploads complete and trigger photo gallery refresh by invalidating the 'photos' query key."
         },
         {
-          "path": "frontend/src/components/Header.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Update header navigation to include visible links (or a compact menu) for Photos, Videos, and Events (minimum) and keep Home and Admin links. Ensure the /admin link remains present and unchanged in behavior."
+          "description": "Implement the useUploadPhoto mutation hook that calls actor.uploadPhoto with PhotoVideoUploadRequest data (name, description, category, blob). Configure the mutation to invalidate the 'photos' query key on success to trigger automatic gallery refresh. Add proper error handling and return mutation state for UI feedback."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Connect VideoUploadSection to backend upload handler with multiple file selection and progress tracking",
+      "acceptanceCriteria": [
+        "File input accepts multiple video files (MP4, WebM, MOV)",
+        "Each selected file is converted to ExternalBlob using upload-utils",
+        "Upload mutation is called for each video with name, description, and blob data",
+        "Upload progress is displayed for each file",
+        "Success message appears after all uploads complete",
+        "Video gallery refreshes automatically to show newly uploaded videos"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/admin/VideoUploadSection.tsx",
+          "operation": "modify",
+          "description": "Enable multiple file selection by adding the 'multiple' attribute to the file input element. Implement file iteration logic to process each selected file through upload-utils.ts to create ExternalBlob instances. For each video, call the uploadVideo mutation from useQueries.ts with name, description, and blob data. Track upload progress using ExternalBlob.withUploadProgress() and display progress indicators. Show success messages after all uploads complete and trigger video gallery refresh by invalidating the 'videos' query key."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Implement the useUploadVideo mutation hook that calls actor.uploadVideo with VideoUploadRequest data (name, description, blob). Configure the mutation to invalidate the 'videos' query key on success to trigger automatic gallery refresh. Add proper error handling and return mutation state for UI feedback."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Connect EventManagementSection create form to backend event creation handler with optional image upload",
+      "acceptanceCriteria": [
+        "Event creation form includes optional image file input",
+        "Form validates required fields (name, description, date) before submission",
+        "Selected image file is converted to ExternalBlob using upload-utils",
+        "Create mutation sends all event data including optional image to backend",
+        "Success message appears after event is created",
+        "Events list refreshes to show the newly created event with image if provided"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/admin/EventManagementSection.tsx",
+          "operation": "modify",
+          "description": "Add an optional file input field to the event creation form for image uploads. Implement form validation to ensure required fields (name, description, date) are present before submission. When an image is selected, convert it to ExternalBlob using upload-utils.ts. Update the form submission handler to call the createEvent mutation from useQueries.ts with EventCreateRequest data including name, description, date (converted using time-utils.ts), optional password, and optional image blob. Display success messages after creation and clear the form."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Implement the useCreateEvent mutation hook that calls actor.createEvent with EventCreateRequest data. Configure the mutation to invalidate the 'events' query key on success to trigger automatic events list refresh. Add proper error handling and return mutation state for UI feedback."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Connect OrdersSection create form to backend order creation handler with complete validation and line items",
+      "acceptanceCriteria": [
+        "Order creation form validates customer name (non-empty string)",
+        "Phone number field accepts standard phone formats",
+        "OrderLineItemsEditor allows adding multiple items with name, quantity, and price",
+        "Form validates that at least one line item exists before submission",
+        "Delivery address field is validated as non-empty",
+        "Payment amount is automatically calculated from line item totals",
+        "Payment method selection is required (Cash, Card, or Online)",
+        "Create mutation sends complete order data to backend",
+        "Success message appears after order is created",
+        "Orders list refreshes to show the newly created order with all details"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/admin/OrdersSection.tsx",
+          "operation": "modify",
+          "description": "Enhance the order creation form to validate customer name as non-empty string, add phone number validation, ensure at least one line item exists using OrderLineItemsEditor, and validate delivery address field. Implement automatic payment total calculation from line items using order-utils.ts. Add payment method selection with required validation. Update the form submission handler to convert dates using time-utils.ts, construct CreateOrderRequest with all order fields (customerName, orderDate, fulfillDate, numberOfDvd, items array, numberOfPrints, payment fields), and call the createOrder mutation from useQueries.ts. Display success messages and clear the form after successful creation."
+        },
+        {
+          "path": "frontend/src/components/admin/OrderLineItemsEditor.tsx",
+          "operation": "modify",
+          "description": "Ensure the OrderLineItemsEditor component properly validates each line item has itemName, quantity (positive integer), and unitPrice (positive amount). Implement proper syncing with the parent OrdersSection form to calculate totals. Add UI feedback for validation errors on individual line items."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Implement the useCreateOrder mutation hook that calls actor.createOrder with CreateOrderRequest data. Configure the mutation to invalidate the 'orders' query key on success to trigger automatic orders list refresh. Add proper error handling and return mutation state for UI feedback."
+        }
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "summary": "Update PhotosViewer to fetch and display photos from backend with blob rendering",
+      "acceptanceCriteria": [
+        "PhotosViewer fetches photos using usePhotos query with selected sort order",
+        "Each photo displays name, description, and category from backend data",
+        "Photo blobs are converted to displayable URLs using blob-utils",
+        "Grid layout displays photos responsively",
+        "Loading state shows while photos are being fetched",
+        "Empty state message displays when no photos exist",
+        "Error state displays if photo fetch fails"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/PhotosViewer.tsx",
+          "operation": "modify",
+          "description": "Replace placeholder content with usePhotos query hook from useQueries.ts, passing the selected sort order. Map the returned Photo array to display each photo's name, description, and category. Convert photo.blob to displayable image URLs using blob-utils.ts externalBlobToUrl() function. Implement responsive grid layout using Tailwind CSS. Add loading spinner while isLoading is true. Display empty state message when photos array is empty. Add error state UI when query error exists."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Implement the usePhotos query hook that calls actor.getPhotos() (or similar backend method to list photos) with the provided sort order parameter. Configure query to refetch on window focus and cache results appropriately. Return query state including data, isLoading, and error for component consumption."
         },
         {
           "path": "frontend/src/pages/PhotosPage.tsx",
           "operation": "modify",
-          "description": "Implement a non-empty Photos landing page with section title, brief description, and primary actions (e.g., browse albums, view favorites) and wire in a reusable viewer component to avoid blank content."
-        },
+          "description": "Ensure PhotosPage properly passes the selected sort order state to PhotosViewer component. Wire up the sort control dropdown to update the sort order state that PhotosViewer consumes."
+        }
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "summary": "Update VideosPage to fetch and display videos from backend with playable video rendering",
+      "acceptanceCriteria": [
+        "VideosPage fetches videos using useVideos query with selected sort order",
+        "Each video displays name and description from backend data",
+        "Video blobs are converted to playable URLs using blob-utils",
+        "HTML5 video player renders each video with standard controls",
+        "Loading state shows while videos are being fetched",
+        "Empty state message displays when no videos exist",
+        "Error state displays if video fetch fails"
+      ],
+      "file_operations": [
         {
           "path": "frontend/src/pages/VideosPage.tsx",
           "operation": "modify",
-          "description": "Implement a non-empty Videos landing page with section title, brief description, and primary actions (e.g., browse, filter) so it is a real page and not an empty placeholder."
+          "description": "Update the useVideos query hook call to fetch videos with the selected sort order. Map the returned Video array to render each video's name and description. Convert video.blob to playable video URLs using blob-utils.ts externalBlobToUrl() function. Render HTML5 video elements with controls attribute, setting the src to the converted blob URL. Implement loading spinner while isLoading is true. Display empty state message when videos array is empty. Add error state UI when query error exists. Ensure videos are displayed in a responsive layout."
         },
         {
-          "path": "frontend/src/pages/EventsPage.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Implement a non-empty Events landing page with section title, brief description, and primary actions (e.g., view event list, open event details) so it is a real page and not an empty placeholder."
-        },
-        {
-          "path": "frontend/src/pages/FavoritesPage.tsx",
-          "operation": "modify",
-          "description": "Implement a non-empty Favorites page to restore the previously existing related section, including basic list scaffolding and clear empty-state messaging."
-        },
-        {
-          "path": "frontend/src/pages/PortfolioPage.tsx",
-          "operation": "modify",
-          "description": "Implement a non-empty Portfolio page to restore the previously existing related section, including basic layout scaffolding and sample tiles/sections (static or client-side placeholder data)."
-        },
-        {
-          "path": "frontend/src/pages/BusinessInfoPage.tsx",
-          "operation": "modify",
-          "description": "Implement a non-empty Business Info page to restore the previously existing related section, including basic contact/about scaffolding and clear labels."
-        },
-        {
-          "path": "frontend/src/pages/SpecialMomentsPage.tsx",
-          "operation": "modify",
-          "description": "Implement a non-empty Special Moments page to restore the previously existing related section, including a basic gallery/list scaffold and empty states."
-        },
-        {
-          "path": "frontend/src/pages/SpecialMomentPage.tsx",
-          "operation": "modify",
-          "description": "Implement a non-empty Special Moment detail page scaffold (title, metadata area, actions, and content region) to support navigation to an individual moment."
-        },
-        {
-          "path": "frontend/src/pages/MediaGroupPage.tsx",
-          "operation": "modify",
-          "description": "Implement a non-empty Media Group page scaffold (group title, description, and list/gallery region) to restore the previously existing related section."
-        },
-        {
-          "path": "frontend/src/pages/EventDetailPage.tsx",
-          "operation": "modify",
-          "description": "Implement a non-empty Event Detail page scaffold (title, date/time display area, access/visibility messaging, and media sections) to ensure event deep-links render content."
-        },
-        {
-          "path": "frontend/src/pages/EventPage.tsx",
-          "operation": "modify",
-          "description": "Implement a non-empty Event page scaffold (overview, calls to action) if it previously existed separately from Events/Detail pages; ensure it renders meaningful content."
-        },
-        {
-          "path": "frontend/src/pages/PhotoDetailPage.tsx",
-          "operation": "modify",
-          "description": "Implement a non-empty Photo Detail page scaffold to support navigation from Photos lists into an individual photo view."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Restore user-facing content and UI structure for Photos/Videos/Events and related sections; update Home to reflect the multi-section experience with English-only labels.",
-      "acceptanceCriteria": [
-        "Home page is updated so it is not exclusively an “Order Management System” marketing page; it includes entry points to the restored sections (Photos/Videos/Events at minimum).",
-        "Each restored section page includes basic layout scaffolding (title, description, primary actions) and does not show empty/blank content.",
-        "All user-facing text introduced/updated by this change is in English."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/HomePage.tsx",
-          "operation": "modify",
-          "description": "Revise Home content away from an order-only marketing page: add entry cards/CTAs to Photos, Videos, and Events (minimum) and optionally highlight related restored sections. Ensure all displayed text is in English."
-        },
-        {
-          "path": "frontend/src/components/Footer.tsx",
-          "operation": "modify",
-          "description": "Update footer branding/copy so it matches the Studio Portal multi-section experience (not only orders). Ensure text is in English."
-        },
-        {
-          "path": "frontend/src/components/PhotosViewer.tsx",
-          "operation": "modify",
-          "description": "Implement a basic, non-empty Photos viewer component used by Photos/Favorites/Special Moments pages: grid layout, selection handling, and an empty state. Where media previews are shown, plan for use of the blob-storage ExternalBlob direct URL when available. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/PhotoActions.tsx",
-          "operation": "modify",
-          "description": "Implement photo action controls UI (e.g., favorite/like toggle, share/copy link, download button scaffold) to restore prior interactivity and ensure pages are not empty."
-        },
-        {
-          "path": "frontend/src/lib/blob-utils.ts",
-          "operation": "modify",
-          "description": "Add frontend utilities for media handling that align with blob-storage: creating ExternalBlob instances from File/bytes, reading direct URLs for preview/streaming, and optional upload progress wiring helpers. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Restore admin panel navigation and additional admin sections beyond Orders with functional, non-empty UIs while keeping existing admin access checks.",
-      "acceptanceCriteria": [
-        "Admin page no longer renders only OrdersSection; it provides a way to access additional admin sections (tabs/side navigation/accordion is acceptable).",
-        "Each admin section that is currently an empty placeholder renders functional UI (not empty files), at least for listing existing entities and providing create/update/delete or upload flows where applicable.",
-        "Admin access checks remain in place; non-admin users still see the admin access helper flow."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/AdminPage.tsx",
-          "operation": "modify",
-          "description": "Keep existing authentication/admin gating logic intact, but add an admin navigation UI (tabs/side-nav) to switch between Orders and restored admin sections. Ensure OrdersSection remains available and working as-is within /admin."
-        },
-        {
-          "path": "frontend/src/components/admin/PhotoUploadSection.tsx",
-          "operation": "modify",
-          "description": "Implement a functional Photo upload/management UI: list existing items (client-side state or query integration placeholder without runtime crashes), add/upload flow with file picker, preview, and basic edit/delete interactions. Use blob-storage ExternalBlob for preview/direct URL and upload progress wiring where appropriate. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/VideoUploadSection.tsx",
-          "operation": "modify",
-          "description": "Implement a functional Video upload/management UI: list, add/upload, and delete/update scaffolding with non-empty content. Use blob-storage ExternalBlob direct URL approach for previews/links and upload progress where appropriate. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/EventManagementSection.tsx",
-          "operation": "modify",
-          "description": "Implement a functional Event management UI: list events, create/edit form scaffolding (title/date/visibility), and delete action (client-side state or safe integration placeholder) so the section is not empty."
-        },
-        {
-          "path": "frontend/src/components/admin/SpecialMomentManagementSection.tsx",
-          "operation": "modify",
-          "description": "Implement a functional Special Moments admin UI: list items, create/edit form scaffolding, and delete action. Where moments include media, structure the UI to display media via blob-storage direct URL when available. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/ShortlistsSection.tsx",
-          "operation": "modify",
-          "description": "Implement a functional Shortlists admin UI scaffold: list entries, view details, and basic management actions so the section is not empty."
-        },
-        {
-          "path": "frontend/src/components/admin/VisitorsSection.tsx",
-          "operation": "modify",
-          "description": "Implement a functional Visitors admin UI scaffold: display visitor list/statistics layout with filters/date ranges (UI-only if necessary) and non-empty states."
-        },
-        {
-          "path": "frontend/src/components/admin/FooterEditSection.tsx",
-          "operation": "modify",
-          "description": "Implement a functional Footer editing UI scaffold: editable fields (e.g., copyright text, links), preview area, and save/reset actions (client-side state or safe integration placeholder) so the section is not empty."
-        },
-        {
-          "path": "frontend/src/components/admin/UserStatisticsSection.tsx",
-          "operation": "modify",
-          "description": "Implement a functional User statistics admin UI scaffold: summary cards and list/table layout with non-empty states."
+          "description": "Implement the useVideos query hook that calls actor.getVideos() (or similar backend method to list videos) with the provided sort order parameter. Configure query to refetch on window focus and cache results appropriately. Return query state including data, isLoading, and error for component consumption."
         }
       ]
     }
